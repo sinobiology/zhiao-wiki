@@ -66,6 +66,7 @@ jobs:
           echo "✅ 知识库已更新！"
           echo "请运行以下命令重新部署到 Fly.io："
           echo "flyctl deploy -a zhiao-wiki"
+          
       - name: 部署到 Fly.io
           if: success()
           uses: superfly/flyctl-actions@master

@@ -60,17 +60,10 @@ jobs:
           git add wiki/ code/web/public/data/
           git diff --quiet && git diff --staged --quiet || (git commit -m "自动更新：知识库数据 $(date +'%Y-%m-%d %H:%M:%S')" && git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git HEAD:main)
 
-      - name: 部署通知
-        if: success()
-        run: |
-          echo "✅ 知识库已更新！"
-          echo "请运行以下命令重新部署到 Fly.io："
-          echo "flyctl deploy -a zhiao-wiki"
-          
       - name: 部署到 Fly.io
-          if: success()
-          uses: superfly/flyctl-actions@master
-          with:
-            args: "deploy -a zhiao-wiki"
-          env:
-            FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+        if: success()
+        uses: superfly/flyctl-actions@master
+        with:
+          args: "deploy -a zhiao-wiki"
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}

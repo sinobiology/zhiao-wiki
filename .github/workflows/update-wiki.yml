@@ -55,7 +55,7 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add wiki/ code/web/public/data/
-          git diff --quiet && git diff --staged --quiet || (git commit -m "自动更新：知识库数据 $(date +'%Y-%m-%d %H:%M:%S')" && git push)
+          git diff --quiet && git diff --staged --quiet || (git commit -m "自动更新：知识库数据 $(date +'%Y-%m-%d %H:%M:%S')" && git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git HEAD:main)
 
       - name: 部署通知
         if: success()

@@ -35,7 +35,7 @@ jobs:
       - name: 安装 Node 依赖
         run: |
           cd code/web
-          npm ci
+          npm install
 
       - name: 运行 ingest.py 生成摘要
         env:

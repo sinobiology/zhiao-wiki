@@ -7,6 +7,9 @@ on:
       - '.github/workflows/update-wiki.yml'
   workflow_dispatch:  # 允许手动触发
 
+permissions:
+  contents: write
+
 jobs:
   update-wiki:
     runs-on: ubuntu-latest

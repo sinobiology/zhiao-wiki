@@ -40,6 +40,7 @@ jobs:
       - name: 运行 ingest.py 生成摘要
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          ANTHROPIC_BASE_URL: https://api.aicodewith.com/v1
         run: |
           cd code
           python ingest.py

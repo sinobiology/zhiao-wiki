@@ -62,8 +62,10 @@ jobs:
 
       - name: 部署到 Fly.io
         if: success()
-        uses: superfly/flyctl-actions@master
-        with:
-          args: "deploy -a zhiao-wiki"
+        uses: superfly/flyctl-actions/setup-flyctl@v1
+
+      - name: 执行部署
+        if: success()
+        run: flyctl deploy -a zhiao-wiki
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}

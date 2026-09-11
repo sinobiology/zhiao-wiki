@@ -30,3 +30,7 @@ yarn-error.log*
 # 临时文件
 .claude/
 .claude/settings.local.json
+
+# Python 缓存
+__pycache__/
+*.pyc

@@ -8,6 +8,7 @@ import json, re, shutil, pathlib
 
 BASE   = pathlib.Path(__file__).parent.parent.parent.parent  # 知奥知识库/
 WIKI   = BASE / "wiki" / "summaries"
+ENTITIES = BASE / "wiki" / "entities"
 OUT    = pathlib.Path(__file__).parent.parent / "public" / "data"
 PAGES  = OUT / "pages"
 
@@ -93,6 +94,14 @@ for f in files:
     shutil.copy2(f, PAGES / f.name)
 
 print(f"  → {len(wiki_index)} 篇文章，{len(entity_refs)} 个实体")
+
+# ── 复制实体页到 public/data/pages/ ───────────────────────────────────────────
+# 前端 PageView 统一按 /data/pages/<slug>.md 取页；实体页与摘要共用同一命名空间，
+# 因此实体页也必须复制过去，否则图谱里的实体节点点开只会显示「暂无对应页面」。
+entity_files = sorted(ENTITIES.glob("*.md")) if ENTITIES.exists() else []
+for f in entity_files:
+    shutil.copy2(f, PAGES / f.name)
+print(f"  ✓ 已复制 {len(entity_files)} 个实体页到 pages/")
 
 # ── 生成 wiki-index.json ──────────────────────────────────────────────────────
 (OUT / "wiki-index.json").write_text(

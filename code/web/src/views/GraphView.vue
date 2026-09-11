@@ -75,7 +75,7 @@ onMounted(buildGraph)
 </script>
 
 <template>
-  <div style="display:flex;flex-direction:column;height:100vh;width:100%;overflow:hidden">
+  <div style="display:flex;flex-direction:column;height:100%;width:100%;overflow:hidden">
     <div class="page-hero" style="padding:20px 36px;flex-shrink:0">
       <h1 style="font-size:20px">知识图谱</h1>
       <p style="font-size:13px;color:rgba(255,255,255,0.5);margin-top:4px">

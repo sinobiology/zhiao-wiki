@@ -144,10 +144,11 @@ body { background: #E8E6E1; }
 .main-content {
   margin-left: var(--sidebar-width);
   flex: 1;
-  min-height: 100vh;
+  height: 100vh;
   display: flex;
   flex-direction: column;
   width: calc(100vw - var(--sidebar-width));
+  overflow: hidden;
 }
 
 /* ── 通用卡片 ── */

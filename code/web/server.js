@@ -34,6 +34,8 @@ let graphData  = { nodes: [], edges: [] }
 let neighbors  = {}   // slug → Set<slug>
 let indexByTitle = {} // title → slug
 let indexBySlug  = {} // slug → page
+let hayCache     = null   // DF 语料缓存（title + excerpt），loadData 后失效重建
+const dfCache    = new Map()  // gram → 文档频率
 
 function loadData() {
   try {
@@ -55,49 +57,150 @@ function loadData() {
       indexBySlug[p.slug]  = p
     }
     console.log(`预加载: ${wikiIndex.length} 页面, ${graphData.nodes.length} 节点, ${graphData.edges.length} 边`)
+    hayCache = null          // 数据换了，DF 语料与缓存必须重建
+    dfCache.clear()
   } catch (e) {
     console.error('数据加载失败:', e.message)
   }
 }
 loadData()
 
-// ── 两阶段检索 ────────────────────────────────────────────────────────────────
+// ── 检索：DF 加权 ngram（两阶段）──────────────────────────────────────────────
+// 中文无空格，用 2–4 字滑窗 ngram 匹配，不引入分词库。代价是会造出大量通用
+// 碎片（「说的」「他是」），它们在长文里到处命中、把不相关的页顶到前面。
+// 但也不能一刀切剪掉 2 字词——「发酵」「赖氨酸」正是 2-3 字，剪掉会漏掉真正
+// 相关的页。所以用「文档频率」(DF) 判断区分度：在语料里出现超过 60% 的 gram
+// 视为无区分度、弃用。实测本库：「发酵」23%、「赖氨酸」6%、「行业」60%
+// 都在阈值内，而被误算成 100% 的只有摘要章节标题（已在 build-data.py 侧剥离）。
+const DF_MAX = 0.6
+const PUNCT  = /[\s，。？！、；：""''“”‘’（）【】《》,.?!\-—·「」『』…～~:;()\[\]"'`|/\\*=#]+/g
+
+// 停用词：虚词、问句框架词、无区分度的连接词。
+// 「怎么做 / 是什么 / 什么关系」这类是每个提问都可能带的框架，不含主题信息，
+// 但长度 3 字会被长度加权放大 → 必须显式停用（DF 过滤拦不住它们，实测 DF 仅 1%）。
+const STOP = new Set([
+  '一个','一直','已经','还是','只是','就是','可以','需要','应该','我们','他们','自己',
+  '什么','怎么','如何','哪些','哪个','哪里','多少','为何',
+  '这个','那个','一些','这些','那些','这样','那样','时候','没有','不能','不会',
+  '因为','所以','但是','如果','那么','为了','对于','关于','通过','进行','以及',
+  '怎么做','怎么办','是什么','什么关系','怎么样','有哪些','哪一个','怎么说',
+  '什么区别','意味着什么','为什么','不是','而是','以及','并且','而且','然后',
+])
+
+// 生成摘要时写入的章节标题，几乎每篇都有，不能参与评分
+const BOILER = new Set([
+  '核心逻辑','心逻辑','核心逻','行业洞察','业洞察','技术管理','管理要点','金句归纳',
+  '句归纳','关联实体','关联实','性要点','术管理',
+])
+
+// 问句框架：切 gram 前先从查询里整体剥掉。
+// 「量本利的囚徒讲的是什么」若不剥离，会切出「讲的是 / 的是 / 是什」等碎片，
+// 任何含「讲的是」「是什么」的页面都会命中并拿到 3 字权重（实测把《百年味之素》
+// 这类无关页顶进候选）。剥离后只留实词，碎片消失。
+const Q_FRAME = /(讲的是什么|说的是什么|指的是什么|是什么意思|意味着什么|什么是|是什么|什么关系|有什么区别|有何区别|主要内容|到底|究竟|怎么样|怎么办|怎么做|怎么理解|如何理解|如何|为什么|有哪些|哪一个|讲的是|说的是|指的是|吗|呢|吧)/g
+
 function ngrams(text, min = 2, max = 4) {
   const tokens = new Set()
+  const clean  = text.toLowerCase().replace(PUNCT, '')
   for (let n = min; n <= max; n++) {
-    for (let i = 0; i <= text.length - n; i++) tokens.add(text.slice(i, i + n))
+    for (let i = 0; i + n <= clean.length; i++) tokens.add(clean.slice(i, i + n))
   }
-  for (const w of text.split(/\s+/)) {
-    if (w.length >= 2) tokens.add(w.toLowerCase())
+  // 英文/数字整词（中文以外）
+  for (const w of text.toLowerCase().split(PUNCT)) {
+    if (w.length >= 2 && /[a-z0-9]/.test(w)) tokens.add(w)
   }
   return tokens
 }
 
-function retrieve(query, topN = 6) {
-  const qTokens = ngrams(query)
-  const qLower  = query.toLowerCase()
-  const scored = wikiIndex.map(p => {
-    let score = 0
-    const titleLower = p.title.toLowerCase()
-    if (titleLower.includes(qLower))  score += 50
-    if (qLower.includes(titleLower))  score += 40
-    for (const t of qTokens) {
-      if (p.title.includes(t))   score += 8
-      if (p.excerpt.includes(t)) score += 3
-    }
-    for (const link of (p.links || [])) {
-      if (query.includes(link) || link.includes(query.slice(0, 4))) score += 6
-    }
-    return { ...p, score }
-  }).filter(p => p.score > 0).sort((a, b) => b.score - a.score)
+// DF 语料 = 每页的 title + excerpt（与检索打分同一空间）
+function buildHay() {
+  if (hayCache) return hayCache
+  hayCache = wikiIndex.map(p => ((p.title || '') + ' ' + (p.excerpt || '')).toLowerCase())
+  return hayCache
+}
 
-  const direct = scored.slice(0, 4)
+function docFreq(g) {
+  if (dfCache.has(g)) return dfCache.get(g)
+  const hay = buildHay()
+  let c = 0
+  for (const h of hay) if (h.includes(g)) c++
+  const r = hay.length ? c / hay.length : 1
+  dfCache.set(g, r)
+  return r
+}
+
+// 该 gram 是否可用于评分：非停用、非样板、具备区分度
+function usable(g) {
+  if (g.length < 2) return false
+  if (STOP.has(g) || BOILER.has(g)) return false
+  return docFreq(g) <= DF_MAX
+}
+
+/**
+ * 返回 { s, strong }。strong = 真的命中了查询，而不是靠某个通用碎片蹭上的。
+ * 背景：原来只要任意 1 个 gram 命中就计分，而正文里满是 2 字组合，长问句会
+ * 恒定命中大量页面、前排混着不相关的页。改为：命中 ≥3 字 gram、或标题整词
+ * 命中、或 ≥2 个不同 2 字词命中，才算 strong。
+ */
+function scorePage(p, q, grams) {
+  let s = 0
+  let strong = q.length <= 2        // 2 字查询本身已是最长 gram
+  let hit2 = 0
+  const title = (p.title || '').toLowerCase()
+  const ex    = (p.excerpt || '').toLowerCase()
+
+  if (q.length >= 2 && title.includes(q)) { s += 50; strong = true }
+  if (title.length >= 2 && q.includes(title)) { s += 40; strong = true }
+
+  for (const g of grams) {
+    if (!usable(g)) continue
+    const w = g.length >= 4 ? 3 : (g.length === 3 ? 2 : 1)   // 长度加权
+    let hit = false
+    if (title.includes(g)) { s += 8 * w; hit = true }
+    else if (ex.includes(g)) { s += 3 * w; hit = true }
+    if (hit) { if (g.length >= 3) strong = true; else hit2++ }
+  }
+  if (hit2 >= 2) strong = true
+
+  for (const lk of new Set(p.links || [])) {       // links 已去重，这里再兜一层
+    if (lk.length >= 2 && q.includes(lk.toLowerCase())) { s += 6; strong = true }
+  }
+  return { s, strong }
+}
+
+function retrieve(query, topN = 6) {
+  const q     = query.toLowerCase()
+  // 先剥疑问框架再切 gram；若剥完全是空的（query 本身全是框架词），回退用原串
+  const qCore = q.replace(Q_FRAME, '').trim()
+  const grams = ngrams(qCore || q)
+
+  const all = []
+  for (const p of wikiIndex) {
+    const r = scorePage(p, q, grams)
+    if (r.s > 0) all.push({ p, s: r.s, strong: r.strong })
+  }
+  all.sort((a, b) => b.s - a.s)
+
+  // strong 优先；不足 4 篇时用普通命中补齐，但设分数门槛（≥8 分，即至少一个
+  // 标题命中或一个正文 3 字命中），避免只蹭到单个碎片的页混进上下文。
+  const MIN_FALLBACK = 8
+  const picked = all.filter(x => x.strong).slice(0, 4)
+  if (picked.length < 4) {
+    const seen = new Set(picked.map(x => x.p.slug))
+    for (const x of all) {
+      if (picked.length >= 4) break
+      if (x.s < MIN_FALLBACK || seen.has(x.p.slug)) continue
+      picked.push(x); seen.add(x.p.slug)
+    }
+  }
+  const direct = picked.map(x => x.p)
   const directSlugs = new Set(direct.map(p => p.slug))
-  const candidates  = new Map()
+
+  // 阶段 2：图谱扩展必须走「文章 → 实体 → 其他文章」二跳：
+  // graph 的边是「文章 ↔ 实体」，直接遍历 neighbors[p.slug] 拿到的全是
+  // entity:* ，若在此处 continue 掉，这一阶段就永远为空（历史 bug）。
+  const candidates = new Map()
   for (const p of direct) {
-    // 图谱扩展必须走「文章 → 实体 → 其他文章」二跳：
-    // graph 的边是「文章 ↔ 实体」，直接遍历 neighbors[p.slug] 拿到的全是
-    // entity:* ，若在此处 continue 掉，这一阶段就永远为空（历史 bug）。
     for (const ent of (neighbors[p.slug] || [])) {
       if (!ent.startsWith('entity:')) continue
       for (const nb of (neighbors[ent] || [])) {
@@ -105,11 +208,14 @@ function retrieve(query, topN = 6) {
         const nbPage = indexBySlug[nb]
         if (!nbPage) continue
         let nbScore = 0
-        for (const t of qTokens) {
-          if (nbPage.title.includes(t))   nbScore += 4
-          if (nbPage.excerpt.includes(t)) nbScore += 1
+        const nTitle = (nbPage.title || '').toLowerCase()
+        const nEx    = (nbPage.excerpt || '').toLowerCase()
+        for (const g of grams) {
+          if (!usable(g)) continue
+          if (nTitle.includes(g))   nbScore += 4
+          else if (nEx.includes(g)) nbScore += 1
         }
-        if (nbScore > 0) {
+        if (nbScore >= 4) {                  // 门槛：至少一个有区分度的实词命中
           const prev = candidates.get(nb)
           if (!prev || prev.score < nbScore) candidates.set(nb, { page: nbPage, score: nbScore })
         }
@@ -118,6 +224,7 @@ function retrieve(query, topN = 6) {
   }
   const extra = [...candidates.values()]
     .sort((a, b) => b.score - a.score).slice(0, 2).map(x => x.page)
+
   return [...direct, ...extra].slice(0, topN)
 }
 

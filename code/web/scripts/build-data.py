@@ -53,11 +53,17 @@ def extract_wikilinks(text):
     return re.findall(r'\[\[([^\]]+)\]\]', text)
 
 def make_excerpt(body, n=200):
-    text = re.sub(r'#+\s', '', body)
+    # 整行删除 markdown 标题（含标题文字），不是只剥 "#"。
+    # 摘要里五个章节标题几乎每篇都有（核心逻辑 / 行业洞察 / 技术管理要点 /
+    # 金句归纳 / 关联实体）——只剥 "#" 会把标题文字留成正文，使这些词在
+    # 语料里 DF≈100%，检索时任何查询都能蹭上，把真正相关的页挤下去。
+    text = re.sub(r'^#{1,6}[ \t]+.*$', '', body, flags=re.M)
     text = re.sub(r'\[\[([^\]]+)\]\]', r'\1', text)
     text = re.sub(r'\*+', '', text)
     text = re.sub(r'`[^`]*`', '', text)
-    text = text.replace('\r', '').replace('\n', ' ').strip()
+    text = text.replace('\r', '').replace('\n', ' ')
+    text = re.sub(r'\s{2,}', ' ', text).strip()
+    text = text.lstrip('-—·•· \t')   # 标题行删除后常以列表符号开头，去掉更干净
     return text[:n]
 
 # ── 扫描所有摘要 ──────────────────────────────────────────────────────────────
@@ -75,12 +81,14 @@ for f in files:
         continue
 
     slug = f.stem
-    links = extract_wikilinks(body)
+    # 保持首次出现顺序去重：正文里同一实体常被 [[..]] 引用多次（实测冗余 596 条），
+    # 重复条目会让检索打分对同一实体重复加成、前端也重复显示标签。
+    links = list(dict.fromkeys(extract_wikilinks(body)))
     article_links[slug] = links
 
     # 统计口径是「被多少篇引用」而非「出现多少次」，必须与 gen_entities.py
     # 的建页门槛一致，否则会出现「图谱里有实体节点、点开却没有页」。
-    for e in set(links):
+    for e in links:
         entity_refs[e] = entity_refs.get(e, 0) + 1
 
     wiki_index.append({

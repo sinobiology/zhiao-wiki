@@ -25,8 +25,14 @@ git push -u origin main
 1. 进入 GitHub 仓库 → Settings → Secrets and variables → Actions
 2. 点击 "New repository secret"
 3. 添加以下 Secret：
-   - **名称**: `ANTHROPIC_API_KEY`
-   - **值**: 你的 Anthropic API Key（从 https://console.anthropic.com 获取）
+   - **名称**: `DEEPSEEK_API_KEY`
+   - **值**: 你的 DeepSeek API Key（从 https://platform.deepseek.com 获取）
+
+4. 同时给 Fly.io 应用配置运行时密钥（「AI 知奥」对话用）：
+   ```bash
+   flyctl secrets set DEEPSEEK_API_KEY=<key> LLM_BASE_URL=https://api.deepseek.com/v1 \
+     LLM_MODEL=deepseek-v4-pro LLM_THINKING=disabled -a zhiao-wiki
+   ```
 
 ### 3. 工作流程
 
@@ -35,6 +41,9 @@ git push -u origin main
 ```bash
 # 1. 复制公众号文章到 raw/articles/ 文件夹
 # 例如：raw/articles/新文章标题.md
+# 更省事的做法：用技能 wechat-article-archive-ingest 的
+#   python3 ~/wechat-article-exporter/archive_from_url.py "<mp.weixin.qq.com/s/xxx>"
+# 它会把正文直接写进 raw/articles/ 并按标题去标点命名
 
 # 2. 推送到 GitHub
 git add raw/articles/
@@ -42,12 +51,15 @@ git commit -m "新增文章：新文章标题"
 git push
 
 # 3. GitHub Actions 自动运行
-# - 运行 ingest.py 生成摘要
+# - 运行 ingest.py 生成摘要（DeepSeek）
 # - 运行 build-data.py 生成 JSON 数据
 # - 自动提交更新
+# - 部署到 Fly.io
 
-# 4. 重新部署到 Fly.io
-flyctl deploy -a zhiao-wiki
+# 4. 若 Actions 没跑通，本地跑同一条链：
+#   python code/ingest.py && python code/web/scripts/build-data.py
+#   git add wiki/ code/web/public/data/ && git commit -m "更新知识库" && git push
+#   flyctl deploy -a zhiao-wiki
 ```
 
 #### 手动触发更新（可选）

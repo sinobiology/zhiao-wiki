@@ -30,6 +30,7 @@ yarn-error.log*
 # 临时文件
 .claude/
 .claude/settings.local.json
+.workbuddy/
 
 # Python 缓存
 __pycache__/

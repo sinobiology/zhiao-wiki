@@ -7,7 +7,6 @@ import cors from 'cors'
 import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
-import Anthropic from '@anthropic-ai/sdk'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const DATA_DIR  = path.join(__dirname, 'public', 'data')
@@ -17,12 +16,17 @@ const app = express()
 app.use(cors())
 app.use(express.json())
 
-const client = new Anthropic({
-  apiKey:  process.env.ANTHROPIC_API_KEY,
-  ...(process.env.ANTHROPIC_BASE_URL ? { baseURL: process.env.ANTHROPIC_BASE_URL } : {}),
-})
-const MODEL    = process.env.ANTHROPIC_MODEL || 'claude-opus-4-6'
-const PASSWORD = process.env.ACCESS_PASSWORD || 'zhiao2026'
+// ── 模型配置（DeepSeek，OpenAI 兼容接口）─────────────────────────────────────
+// 只用 Node 内置 fetch，不再依赖 @anthropic-ai/sdk
+const LLM_BASE_URL = (process.env.LLM_BASE_URL || 'https://api.deepseek.com/v1').replace(/\/+$/, '')
+const LLM_API_KEY  = process.env.DEEPSEEK_API_KEY || process.env.LLM_API_KEY
+const MODEL        = process.env.LLM_MODEL || 'deepseek-v4-pro'
+const THINKING_OFF = (process.env.LLM_THINKING || 'disabled').toLowerCase() === 'disabled'
+// deepseek-v4-pro / flash 均为推理模型，思考链与正文共享 max_tokens，给少会「静默返回空正文」
+const MAX_TOKENS   = Number(process.env.LLM_MAX_TOKENS || 2048)
+const PASSWORD     = process.env.ACCESS_PASSWORD || 'zhiao2026'
+
+if (!LLM_API_KEY) console.warn('⚠️  未配置 DEEPSEEK_API_KEY，/api/chat 将不可用')
 
 // ── 启动时预加载数据 ──────────────────────────────────────────────────────────
 let wikiIndex = []
@@ -167,16 +171,47 @@ ${context}`
   res.setHeader('Connection', 'keep-alive')
 
   try {
-    const stream = client.messages.stream({
-      model: MODEL,
-      max_tokens: 1024,
-      system: systemPrompt,
-      messages,
+    const upstream = await fetch(`${LLM_BASE_URL}/chat/completions`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${LLM_API_KEY}`,
+        'Content-Type':  'application/json',
+      },
+      body: JSON.stringify({
+        model: MODEL,
+        max_tokens: MAX_TOKENS,
+        stream: true,
+        ...(THINKING_OFF ? { thinking: { type: 'disabled' } } : {}),
+        messages: [{ role: 'system', content: systemPrompt }, ...messages],
+      }),
     })
 
-    for await (const chunk of stream) {
-      if (chunk.type === 'content_block_delta' && chunk.delta?.text) {
-        res.write(`data: ${JSON.stringify({ text: chunk.delta.text })}\n\n`)
+    if (!upstream.ok) {
+      const detail = await upstream.text().catch(() => '')
+      throw new Error(`上游 ${upstream.status}：${detail.slice(0, 300)}`)
+    }
+
+    const reader  = upstream.body.getReader()
+    const decoder = new TextDecoder()
+    let buffer = ''
+
+    while (true) {
+      const { done, value } = await reader.read()
+      if (done) break
+      buffer += decoder.decode(value, { stream: true })
+
+      const lines = buffer.split('\n')
+      buffer = lines.pop()              // 末行可能不完整，留到下一轮
+      for (const line of lines) {
+        const s = line.trim()
+        if (!s.startsWith('data:')) continue
+        const payload = s.slice(5).trim()
+        if (!payload || payload === '[DONE]') continue
+        let chunk
+        try { chunk = JSON.parse(payload) } catch { continue }
+        // 推理模型的思考链走 reasoning_content，不发给前端
+        const text = chunk.choices?.[0]?.delta?.content
+        if (text) res.write(`data: ${JSON.stringify({ text })}\n\n`)
       }
     }
 

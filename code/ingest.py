@@ -1,26 +1,37 @@
 """
-ingest.py — 知奥ZHAO 知识库生成脚本
+ingest.py — 知奥ZHAO 知识库生成脚本（DeepSeek 版）
 
 功能：
   1. 扫描 raw/articles/ 下的 Markdown 文件
-  2. 调用 Anthropic API 按 SCHEMA.md 规范生成摘要
+  2. 调用 DeepSeek（OpenAI 兼容接口）按 SCHEMA.md 规范生成摘要
   3. 将摘要保存到 wiki/summaries/
   4. 更新 wiki/index.md
 
 用法：
   python code/ingest.py                    # 处理所有未处理文章
-  python code/ingest.py --file 文章名.md   # 处理单篇
+  python code/ingest.py --file 文章名.md   # 处理单篇（强制重做）
   python code/ingest.py --rebuild          # 强制重建所有摘要
+
+环境变量（全部可选，默认值见下）：
+  DEEPSEEK_API_KEY / LLM_API_KEY   必填，取 ~/.hermes/.env 里的 DEEPSEEK_API_KEY
+  LLM_BASE_URL     default: https://api.deepseek.com/v1
+  LLM_MODEL        default: deepseek-v4-pro   （可选 deepseek-flash，更快更省）
+  LLM_THINKING     default: disabled          （enabled 会走思考链，与正文共享 max_tokens）
+  LLM_MAX_TOKENS   default: 4096
+  LLM_TIMEOUT      default: 180
+
+仅用标准库，无需 pip 安装任何依赖。
 """
 
 import os
 import re
 import json
+import time
 import argparse
 import datetime
+import urllib.request
+import urllib.error
 from pathlib import Path
-
-import anthropic
 
 # ── 路径配置 ──────────────────────────────────────────────────────────────────
 BASE_DIR    = Path(__file__).parent.parent          # 知奥知识库/
@@ -31,14 +42,28 @@ INDEX_FILE  = WIKI_DIR / "index.md"
 
 SUMMARY_DIR.mkdir(parents=True, exist_ok=True)
 
-# ── Anthropic 客户端 ──────────────────────────────────────────────────────────
-# 支持第三方代理（如 aicodewith）：设置 ANTHROPIC_BASE_URL 环境变量即可
-_base_url = os.environ.get("ANTHROPIC_BASE_URL")  # 不设置则使用官方地址
-client = anthropic.Anthropic(
-    api_key=os.environ.get("ANTHROPIC_API_KEY"),
-    base_url=_base_url if _base_url else None,
-)
-MODEL = "claude-opus-4-6"
+# ── 模型配置 ──────────────────────────────────────────────────────────────────
+def _load_key() -> str | None:
+    """按优先级取 key：环境变量 → ~/.hermes/.env 的 DEEPSEEK_API_KEY。"""
+    for env in ("DEEPSEEK_API_KEY", "LLM_API_KEY"):
+        if os.environ.get(env):
+            return os.environ[env].strip()
+    hermes_env = Path.home() / ".hermes" / ".env"
+    if hermes_env.exists():
+        for line in hermes_env.read_text(encoding="utf-8", errors="ignore").splitlines():
+            if line.startswith("DEEPSEEK_API_KEY="):
+                return line.split("=", 1)[1].strip().strip('"').strip("'")
+    return None
+
+BASE_URL    = os.environ.get("LLM_BASE_URL", "https://api.deepseek.com/v1").rstrip("/")
+MODEL       = os.environ.get("LLM_MODEL", "deepseek-v4-pro")
+THINKING    = os.environ.get("LLM_THINKING", "disabled").lower()
+MAX_TOKENS  = int(os.environ.get("LLM_MAX_TOKENS", "4096"))
+TIMEOUT     = int(os.environ.get("LLM_TIMEOUT", "180"))
+API_KEY     = _load_key()
+
+# 回环/内网地址绕开代理；公网地址跟随系统代理（本机有全局代理，端口会变）
+_OPENER = urllib.request.build_opener()
 
 # ── 文章类型关键词（用于辅助分类） ────────────────────────────────────────────
 TYPE_KEYWORDS = {
@@ -91,8 +116,10 @@ entities: ["实体1", "实体2", "实体3"]
 【规则】
 - 双向链接必须用 [[实体名]] 格式
 - 实体包括：产品名、公司名、人名、核心概念
+- type 只能取这五个值之一：技术、行业、管理、感悟、产品
 - 摘要要保留原文的逻辑骨架，不要泛泛而谈
 - 金句必须是原文原话，不要改写
+- 直接输出摘要页本身，不要用代码块包裹，不要添加任何额外说明
 """
 
 def build_user_prompt(filename: str, content: str, article_type: str) -> str:
@@ -110,6 +137,82 @@ def build_user_prompt(filename: str, content: str, article_type: str) -> str:
 请严格按照系统提示中的格式输出，不要添加任何额外说明。"""
 
 
+# ── LLM 调用 ──────────────────────────────────────────────────────────────────
+def _strip_code_fence(text: str) -> str:
+    """模型偶尔会用 ```markdown 包裹，剥掉。"""
+    t = text.strip()
+    m = re.match(r"^```[a-zA-Z]*\s*\n(.*?)\n?```$", t, re.S)
+    return m.group(1).strip() if m else t
+
+
+def call_llm(system: str, user: str, retries: int = 3) -> str:
+    """
+    调用 OpenAI 兼容的 /chat/completions。
+
+    ⚠️ deepseek-v4-pro / deepseek-flash 都是推理模型：思考链写在 reasoning_content，
+    且与正文共享 max_tokens。若思考没被关掉又给少了额度，会出现「HTTP 200、无报错、
+    正文零字」的静默失败——所以这里显式关思考，并对该情形单独报错。
+    """
+    payload = {
+        "model": MODEL,
+        "max_tokens": MAX_TOKENS,
+        "messages": [
+            {"role": "system", "content": system},
+            {"role": "user", "content": user},
+        ],
+    }
+    if THINKING == "disabled":
+        payload["thinking"] = {"type": "disabled"}
+
+    body = json.dumps(payload).encode("utf-8")
+    last_err = None
+
+    for attempt in range(1, retries + 1):
+        try:
+            req = urllib.request.Request(
+                f"{BASE_URL}/chat/completions",
+                data=body,
+                headers={
+                    "Authorization": f"Bearer {API_KEY}",
+                    "Content-Type": "application/json",
+                },
+                method="POST",
+            )
+            with _OPENER.open(req, timeout=TIMEOUT) as r:
+                data = json.load(r)
+
+            msg = data["choices"][0]["message"]
+            content = (msg.get("content") or "").strip()
+            reasoning = (msg.get("reasoning_content") or "").strip()
+            finish = data["choices"][0].get("finish_reason")
+
+            if not content:
+                # 静默失败：正文空、只有思考链，或额度被思考吃光
+                detail = "思考链吃光了 max_tokens" if reasoning or finish == "length" else "模型返回空正文"
+                raise RuntimeError(
+                    f"{detail}（finish_reason={finish}, "
+                    f"reasoning_content={len(reasoning)} 字, usage={data.get('usage')}）"
+                )
+
+            if len(content) < 200:
+                raise RuntimeError(f"正文过短（{len(content)} 字），疑似截断：{content[:120]}")
+
+            return _strip_code_fence(content)
+
+        except (urllib.error.HTTPError, urllib.error.URLError, RuntimeError, KeyError,
+                json.JSONDecodeError) as e:
+            last_err = e
+            code = getattr(e, "code", None)
+            if code in (401, 403):      # 鉴权失败，重试无意义
+                raise
+            if attempt < retries:
+                wait = 2 * attempt
+                print(f"    [重试 {attempt}/{retries - 1}] {e} — {wait}s 后再来")
+                time.sleep(wait)
+
+    raise RuntimeError(f"调用失败（已重试 {retries} 次）：{last_err}")
+
+
 # ── 处理单篇文章 ──────────────────────────────────────────────────────────────
 def process_article(md_path: Path, force: bool = False) -> Path | None:
     """
@@ -123,26 +226,21 @@ def process_article(md_path: Path, force: bool = False) -> Path | None:
         print(f"  [跳过] {md_path.name}（已存在摘要）")
         return None
 
-    print(f"  [处理] {md_path.name} ...")
     content = md_path.read_text(encoding="utf-8", errors="ignore")
 
     if len(content.strip()) < 100:
         print(f"  [跳过] {md_path.name}（内容过短）")
         return None
 
+    print(f"  [处理] {md_path.name} ...")
     article_type = classify_article(content)
 
-    message = client.messages.create(
-        model=MODEL,
-        max_tokens=2048,
-        system=SYSTEM_PROMPT,
-        messages=[
-            {"role": "user", "content": build_user_prompt(md_path.name, content, article_type)}
-        ],
+    wiki_content = call_llm(
+        SYSTEM_PROMPT,
+        build_user_prompt(md_path.name, content, article_type),
     )
 
-    wiki_content = message.content[0].text
-    out_path.write_text(wiki_content, encoding="utf-8")
+    out_path.write_text(wiki_content.rstrip() + "\n", encoding="utf-8")
     print(f"  [完成] → {out_path.relative_to(BASE_DIR)}")
     return out_path
 
@@ -178,15 +276,17 @@ def update_index():
 
 # ── 主入口 ────────────────────────────────────────────────────────────────────
 def main():
-    parser = argparse.ArgumentParser(description="知奥ZHAO 知识库生成脚本")
+    parser = argparse.ArgumentParser(description="知奥ZHAO 知识库生成脚本（DeepSeek）")
     parser.add_argument("--file", help="只处理指定文件名（相对于 raw/articles/）")
     parser.add_argument("--rebuild", action="store_true", help="强制重建所有摘要")
     args = parser.parse_args()
 
-    if not os.environ.get("ANTHROPIC_API_KEY"):
-        print("错误：请先设置环境变量 ANTHROPIC_API_KEY")
-        print("  Windows: set ANTHROPIC_API_KEY=sk-ant-...")
+    if not API_KEY:
+        print("错误：未找到 API Key")
+        print("  设置 DEEPSEEK_API_KEY，或确认 ~/.hermes/.env 中存在该变量")
         return
+
+    print(f"模型：{MODEL} @ {BASE_URL} | 思考：{THINKING} | max_tokens：{MAX_TOKENS}\n")
 
     if args.file:
         target = RAW_DIR / args.file
@@ -202,13 +302,20 @@ def main():
             return
 
         print(f"找到 {len(md_files)} 篇文章，开始处理...\n")
-        processed = 0
+        processed, failed = 0, []
         for md in md_files:
-            result = process_article(md, force=args.rebuild)
-            if result:
-                processed += 1
+            try:
+                if process_article(md, force=args.rebuild):
+                    processed += 1
+            except Exception as e:
+                print(f"  [失败] {md.name} → {e}")
+                failed.append((md.name, str(e)))
 
         print(f"\n本次处理：{processed} 篇 | 总计：{len(list(SUMMARY_DIR.glob('*.md')))} 篇")
+        if failed:
+            print(f"失败 {len(failed)} 篇：")
+            for name, err in failed:
+                print(f"  - {name} → {err[:120]}")
 
     update_index()
 

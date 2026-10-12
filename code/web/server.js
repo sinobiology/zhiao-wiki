@@ -33,6 +33,7 @@ let wikiIndex = []
 let graphData  = { nodes: [], edges: [] }
 let neighbors  = {}   // slug → Set<slug>
 let indexByTitle = {} // title → slug
+let indexBySlug  = {} // slug → page
 
 function loadData() {
   try {
@@ -46,10 +47,12 @@ function loadData() {
       neighbors[e.source].add(e.target)
       neighbors[e.target].add(e.source)
     }
-    // 构建 title 索引
+    // 构建索引
     indexByTitle = {}
+    indexBySlug  = {}
     for (const p of wikiIndex) {
       indexByTitle[p.title] = p.slug
+      indexBySlug[p.slug]  = p
     }
     console.log(`预加载: ${wikiIndex.length} 页面, ${graphData.nodes.length} 节点, ${graphData.edges.length} 边`)
   } catch (e) {
@@ -92,16 +95,25 @@ function retrieve(query, topN = 6) {
   const directSlugs = new Set(direct.map(p => p.slug))
   const candidates  = new Map()
   for (const p of direct) {
-    for (const nb of (neighbors[p.slug] || [])) {
-      if (directSlugs.has(nb) || nb.startsWith('entity:')) continue
-      const nbPage = wikiIndex.find(x => x.slug === nb)
-      if (!nbPage) continue
-      let nbScore = 0
-      for (const t of qTokens) {
-        if (nbPage.title.includes(t))   nbScore += 4
-        if (nbPage.excerpt.includes(t)) nbScore += 1
+    // 图谱扩展必须走「文章 → 实体 → 其他文章」二跳：
+    // graph 的边是「文章 ↔ 实体」，直接遍历 neighbors[p.slug] 拿到的全是
+    // entity:* ，若在此处 continue 掉，这一阶段就永远为空（历史 bug）。
+    for (const ent of (neighbors[p.slug] || [])) {
+      if (!ent.startsWith('entity:')) continue
+      for (const nb of (neighbors[ent] || [])) {
+        if (directSlugs.has(nb) || nb.startsWith('entity:')) continue
+        const nbPage = indexBySlug[nb]
+        if (!nbPage) continue
+        let nbScore = 0
+        for (const t of qTokens) {
+          if (nbPage.title.includes(t))   nbScore += 4
+          if (nbPage.excerpt.includes(t)) nbScore += 1
+        }
+        if (nbScore > 0) {
+          const prev = candidates.get(nb)
+          if (!prev || prev.score < nbScore) candidates.set(nb, { page: nbPage, score: nbScore })
+        }
       }
-      if (nbScore > 0) candidates.set(nb, { page: nbPage, score: nbScore })
     }
   }
   const extra = [...candidates.values()]

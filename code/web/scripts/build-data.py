@@ -23,6 +23,10 @@ TYPE_COLOR = {
     "产品": "letter",
 }
 
+# 图谱中实体节点的最低引用次数。只被 1 篇引用的实体只连 1 条边，是纯噪音；
+# 历史上这里漏判（注释写了 ≥2 但代码只判重），导致 1600+ 个孤立节点进图。
+MIN_ENTITY_REFS = 3
+
 def parse_frontmatter(text):
     """字符串 split 解析 YAML frontmatter，不依赖 gray-matter。"""
     if not text.startswith("---"):
@@ -74,7 +78,9 @@ for f in files:
     links = extract_wikilinks(body)
     article_links[slug] = links
 
-    for e in links:
+    # 统计口径是「被多少篇引用」而非「出现多少次」，必须与 gen_entities.py
+    # 的建页门槛一致，否则会出现「图谱里有实体节点、点开却没有页」。
+    for e in set(links):
         entity_refs[e] = entity_refs.get(e, 0) + 1
 
     wiki_index.append({
@@ -123,18 +129,27 @@ for item in wiki_index:
     })
     node_ids.add(item["slug"])
 
-# 实体节点（只保留被引用 2 次以上的）
+# 实体节点：只保留被引用 ≥MIN_ENTITY_REFS 次的；按 refs 降序排列，
+# 保证前端截断渲染时优先保留高频实体。
+has_page = {f.stem for f in entity_files}
+ent_nodes = []
 for entity, count in entity_refs.items():
+    if count < MIN_ENTITY_REFS:
+        continue
     eid = f"entity:{entity}"
-    if eid not in node_ids:
-        nodes.append({
-            "id":    eid,
-            "label": entity,
-            "group": "entity",
-            "type":  "entity",
-            "refs":  count,
-        })
-        node_ids.add(eid)
+    if eid in node_ids:
+        continue
+    ent_nodes.append({
+        "id":      eid,
+        "label":   entity,
+        "group":   "entity",
+        "type":    "entity",
+        "refs":    count,
+        "hasPage": entity in has_page,
+    })
+    node_ids.add(eid)
+ent_nodes.sort(key=lambda n: -n["refs"])
+nodes.extend(ent_nodes)
 
 # 边
 edges = []
@@ -149,6 +164,22 @@ for slug, links in article_links.items():
     encoding="utf-8"
 )
 print(f"  ✓ graph.json ({len(nodes)} 节点, {len(edges)} 边)")
+
+# ── 生成 entity-index.json（实体页清单，供前端判断 wikilink 能否打开）────────
+entity_index = []
+for f in entity_files:
+    meta, _ = parse_frontmatter(f.read_text(encoding="utf-8"))
+    entity_index.append({
+        "slug":  f.stem,
+        "title": meta.get("title", f.stem),
+        "type":  meta.get("type", ""),
+        "refs":  entity_refs.get(f.stem, 0),
+    })
+entity_index.sort(key=lambda x: -x["refs"])
+(OUT / "entity-index.json").write_text(
+    json.dumps(entity_index, ensure_ascii=False, indent=2), encoding="utf-8"
+)
+print(f"  ✓ entity-index.json（{len(entity_index)} 个实体页）")
 
 # ── 生成 search-index.json ────────────────────────────────────────────────────
 search_index = [

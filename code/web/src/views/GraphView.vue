@@ -10,7 +10,7 @@ const loading = ref(true)
 
 const TYPE_COLORS = {
   '技术': '#3B7DD8', '行业': '#47956A', '管理': '#7E5FAD', '感悟': '#C5961B', '产品': '#C2604A',
-  'entity': '#94A3B8'
+  '公司': '#5B8C6E', '人物': '#B07A3C', 'entity': '#7C8FA6'
 }
 
 async function buildGraph() {
@@ -26,12 +26,15 @@ async function buildGraph() {
   const g = svg.append('g')
   svg.call(d3.zoom().scaleExtent([0.2, 5]).on('zoom', e => g.attr('transform', e.transform)))
 
-  // 只渲染前 500 个节点避免卡顿
-  const nodes = data.nodes.slice(0, 500).map(n => ({ ...n }))
+  // build-data.py 已保证节点顺序是「文章在前、实体按引用次数降序」，
+  // 所以这里截断时优先保留文章与高频实体。上限 900 可容纳
+  // 「365 篇文章 + 全部 ≥3 次引用的实体」。
+  const MAX_NODES = 900
+  const nodes = data.nodes.slice(0, MAX_NODES).map(n => ({ ...n }))
   const nodeIds = new Set(nodes.map(n => n.id))
   const links = data.edges
     .filter(e => nodeIds.has(e.source) && nodeIds.has(e.target))
-    .slice(0, 800)
+    .slice(0, 3000)
     .map(e => ({ ...e }))
 
   const sim = d3.forceSimulation(nodes)
@@ -50,11 +53,20 @@ async function buildGraph() {
       .on('drag',  (e, d) => { d.fx = e.x; d.fy = e.y })
       .on('end',   (e, d) => { if (!e.active) sim.alphaTarget(0); d.fx = null; d.fy = null })
     )
-    .on('click', (_, d) => { if (d.type === 'article') router.push('/page/' + d.id) })
+    .on('click', (_, d) => {
+      if (d.type === 'article') {
+        router.push('/page/' + d.id)
+      } else if (d.hasPage) {
+        // 实体节点 id 形如 entity:赖氨酸，实体页文件名就是「赖氨酸.md」
+        router.push('/page/' + encodeURIComponent(d.id.replace(/^entity:/, '')))
+      }
+    })
 
   node.append('circle')
-    .attr('r', d => d.type === 'article' ? 6 : 3)
-    .attr('fill', d => TYPE_COLORS[d.group] || '#94A3B8')
+    .attr('r', d => d.type === 'article' ? 6 : (d.hasPage ? 4 : 2.5))
+    .attr('fill', d => d.type === 'entity'
+      ? (d.hasPage ? '#7C8FA6' : '#CBD5E1')
+      : (TYPE_COLORS[d.group] || '#94A3B8'))
     .attr('stroke', '#fff').attr('stroke-width', 1.5)
 
   node.filter(d => d.type === 'article').append('text')
@@ -79,13 +91,13 @@ onMounted(buildGraph)
     <div class="page-hero" style="padding:20px 36px;flex-shrink:0">
       <h1 style="font-size:20px">知识图谱</h1>
       <p style="font-size:13px;color:rgba(255,255,255,0.5);margin-top:4px">
-        {{ stats.nodes }} 节点 · {{ stats.edges }} 条边 · 点击文章节点查看详情
+        {{ stats.nodes }} 节点 · {{ stats.edges }} 条边 · 点击文章或实体节点查看详情
       </p>
     </div>
 
     <!-- 图例 -->
     <div style="padding:12px 36px;background:var(--bg-primary);border-bottom:1px solid var(--border-light);display:flex;gap:20px;flex-wrap:wrap;flex-shrink:0">
-      <span v-for="(color, type) in { '技术':'#3B7DD8','行业':'#47956A','管理':'#7E5FAD','感悟':'#C5961B','产品':'#C2604A','实体':'#94A3B8' }" :key="type"
+      <span v-for="(color, type) in { '技术':'#3B7DD8','行业':'#47956A','管理':'#7E5FAD','感悟':'#C5961B','产品':'#C2604A','实体(可打开)':'#7C8FA6','实体(无页)':'#CBD5E1' }" :key="type"
         style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text-secondary)">
         <span :style="{ background: color }" style="width:8px;height:8px;border-radius:50%;display:inline-block"></span>
         {{ type }}

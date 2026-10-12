@@ -1,0 +1,1448 @@
+[
+  {
+    "slug": "规模效应",
+    "title": "规模效应",
+    "type": "管理",
+    "refs": 124
+  },
+  {
+    "slug": "赖氨酸",
+    "title": "赖氨酸",
+    "type": "产品",
+    "refs": 69
+  },
+  {
+    "slug": "味之素",
+    "title": "味之素",
+    "type": "公司",
+    "refs": 56
+  },
+  {
+    "slug": "梅花生物",
+    "title": "梅花生物",
+    "type": "公司",
+    "refs": 42
+  },
+  {
+    "slug": "知奥ZHAO",
+    "title": "知奥ZHAO",
+    "type": "产品",
+    "refs": 37
+  },
+  {
+    "slug": "比特币",
+    "title": "比特币",
+    "type": "产品",
+    "refs": 35
+  },
+  {
+    "slug": "缬氨酸",
+    "title": "缬氨酸",
+    "type": "产品",
+    "refs": 31
+  },
+  {
+    "slug": "合成生物学",
+    "title": "合成生物学",
+    "type": "技术",
+    "refs": 30
+  },
+  {
+    "slug": "苏氨酸",
+    "title": "苏氨酸",
+    "type": "产品",
+    "refs": 30
+  },
+  {
+    "slug": "阜丰集团",
+    "title": "阜丰集团",
+    "type": "公司",
+    "refs": 26
+  },
+  {
+    "slug": "发酵工程",
+    "title": "发酵工程",
+    "type": "技术",
+    "refs": 25
+  },
+  {
+    "slug": "氨基酸",
+    "title": "氨基酸",
+    "type": "行业",
+    "refs": 23
+  },
+  {
+    "slug": "华恒生物",
+    "title": "华恒生物",
+    "type": "公司",
+    "refs": 22
+  },
+  {
+    "slug": "协和发酵",
+    "title": "协和发酵",
+    "type": "公司",
+    "refs": 20
+  },
+  {
+    "slug": "长期主义",
+    "title": "长期主义",
+    "type": "概念",
+    "refs": 20
+  },
+  {
+    "slug": "色氨酸",
+    "title": "色氨酸",
+    "type": "产品",
+    "refs": 19
+  },
+  {
+    "slug": "蛋氨酸",
+    "title": "蛋氨酸",
+    "type": "产品",
+    "refs": 19
+  },
+  {
+    "slug": "谷氨酸棒杆菌",
+    "title": "谷氨酸棒杆菌",
+    "type": "概念",
+    "refs": 19
+  },
+  {
+    "slug": "李笑来",
+    "title": "李笑来",
+    "type": "人物",
+    "refs": 18
+  },
+  {
+    "slug": "成本曲线",
+    "title": "成本曲线",
+    "type": "管理",
+    "refs": 17
+  },
+  {
+    "slug": "谷氨酸",
+    "title": "谷氨酸",
+    "type": "产品",
+    "refs": 17
+  },
+  {
+    "slug": "得到",
+    "title": "得到",
+    "type": "产品",
+    "refs": 16
+  },
+  {
+    "slug": "CJ集团",
+    "title": "CJ集团（CJ CheilJedang）",
+    "type": "公司",
+    "refs": 15
+  },
+  {
+    "slug": "专利战",
+    "title": "专利战",
+    "type": "管理",
+    "refs": 15
+  },
+  {
+    "slug": "发酵罐",
+    "title": "发酵罐",
+    "type": "技术",
+    "refs": 15
+  },
+  {
+    "slug": "星湖科技",
+    "title": "星湖科技",
+    "type": "公司",
+    "refs": 15
+  },
+  {
+    "slug": "生物制造",
+    "title": "生物制造",
+    "type": "技术",
+    "refs": 14
+  },
+  {
+    "slug": "ChatGPT",
+    "title": "ChatGPT",
+    "type": "产品",
+    "refs": 13
+  },
+  {
+    "slug": "反倾销",
+    "title": "反倾销",
+    "type": "概念",
+    "refs": 13
+  },
+  {
+    "slug": "复利",
+    "title": "复利",
+    "type": "感悟",
+    "refs": 13
+  },
+  {
+    "slug": "大肠杆菌",
+    "title": "大肠杆菌",
+    "type": "概念",
+    "refs": 13
+  },
+  {
+    "slug": "氨基酸发酵",
+    "title": "氨基酸发酵",
+    "type": "行业",
+    "refs": 13
+  },
+  {
+    "slug": "玉米湿法工艺",
+    "title": "玉米湿法工艺",
+    "type": "概念",
+    "refs": 13
+  },
+  {
+    "slug": "糖源之战系列",
+    "title": "糖源之战系列",
+    "type": "概念",
+    "refs": 13
+  },
+  {
+    "slug": "大成生化",
+    "title": "大成生化",
+    "type": "公司",
+    "refs": 12
+  },
+  {
+    "slug": "巴菲特",
+    "title": "巴菲特",
+    "type": "人物",
+    "refs": 12
+  },
+  {
+    "slug": "AI Agent",
+    "title": "AI Agent",
+    "type": "技术",
+    "refs": 11
+  },
+  {
+    "slug": "AI",
+    "title": "AI",
+    "type": "技术",
+    "refs": 11
+  },
+  {
+    "slug": "凯赛生物",
+    "title": "凯赛生物",
+    "type": "公司",
+    "refs": 11
+  },
+  {
+    "slug": "发酵产业",
+    "title": "发酵产业",
+    "type": "行业",
+    "refs": 11
+  },
+  {
+    "slug": "系统性降本",
+    "title": "系统性降本",
+    "type": "管理",
+    "refs": 11
+  },
+  {
+    "slug": "菌种工程",
+    "title": "菌种工程",
+    "type": "技术",
+    "refs": 11
+  },
+  {
+    "slug": "亚硫酸浸泡",
+    "title": "亚硫酸浸泡",
+    "type": "概念",
+    "refs": 10
+  },
+  {
+    "slug": "基因编辑",
+    "title": "基因编辑",
+    "type": "技术",
+    "refs": 10
+  },
+  {
+    "slug": "定投",
+    "title": "定投",
+    "type": "技术",
+    "refs": 10
+  },
+  {
+    "slug": "新和成",
+    "title": "新和成",
+    "type": "公司",
+    "refs": 10
+  },
+  {
+    "slug": "玉米浆",
+    "title": "玉米浆",
+    "type": "产品",
+    "refs": 10
+  },
+  {
+    "slug": "英伟达",
+    "title": "英伟达",
+    "type": "公司",
+    "refs": 10
+  },
+  {
+    "slug": "ADM",
+    "title": "ADM",
+    "type": "公司",
+    "refs": 9
+  },
+  {
+    "slug": "Claude Code",
+    "title": "Claude Code",
+    "type": "产品",
+    "refs": 9
+  },
+  {
+    "slug": "OpenClaw",
+    "title": "OpenClaw",
+    "type": "产品",
+    "refs": 9
+  },
+  {
+    "slug": "低蛋白日粮",
+    "title": "低蛋白日粮",
+    "type": "概念",
+    "refs": 9
+  },
+  {
+    "slug": "卓克",
+    "title": "卓克",
+    "type": "人物",
+    "refs": 9
+  },
+  {
+    "slug": "万维钢",
+    "title": "万维钢",
+    "type": "人物",
+    "refs": 8
+  },
+  {
+    "slug": "伊品生物",
+    "title": "伊品生物",
+    "type": "公司",
+    "refs": 8
+  },
+  {
+    "slug": "希杰",
+    "title": "希杰",
+    "type": "公司",
+    "refs": 8
+  },
+  {
+    "slug": "玉米",
+    "title": "玉米",
+    "type": "行业",
+    "refs": 8
+  },
+  {
+    "slug": "豆粕",
+    "title": "豆粕",
+    "type": "行业",
+    "refs": 8
+  },
+  {
+    "slug": "赢创",
+    "title": "赢创",
+    "type": "公司",
+    "refs": 8
+  },
+  {
+    "slug": "337调查",
+    "title": "337调查",
+    "type": "行业",
+    "refs": 7
+  },
+  {
+    "slug": "ABF",
+    "title": "ABF（味之素积层膜）",
+    "type": "产品",
+    "refs": 7
+  },
+  {
+    "slug": "DeepSeek",
+    "title": "DeepSeek",
+    "type": "产品",
+    "refs": 7
+  },
+  {
+    "slug": "Gemini",
+    "title": "Gemini",
+    "type": "产品",
+    "refs": 7
+  },
+  {
+    "slug": "代谢工程",
+    "title": "代谢工程",
+    "type": "技术",
+    "refs": 7
+  },
+  {
+    "slug": "星湖伊品",
+    "title": "星湖伊品",
+    "type": "公司",
+    "refs": 7
+  },
+  {
+    "slug": "溶氧",
+    "title": "溶氧",
+    "type": "技术",
+    "refs": 7
+  },
+  {
+    "slug": "AI协作",
+    "title": "AI协作",
+    "type": "概念",
+    "refs": 6
+  },
+  {
+    "slug": "人机协作",
+    "title": "人机协作",
+    "type": "管理",
+    "refs": 6
+  },
+  {
+    "slug": "人生复利飞轮",
+    "title": "人生复利飞轮",
+    "type": "管理",
+    "refs": 6
+  },
+  {
+    "slug": "伊品",
+    "title": "伊品",
+    "type": "公司",
+    "refs": 6
+  },
+  {
+    "slug": "喷射液化器",
+    "title": "喷射液化器",
+    "type": "技术",
+    "refs": 6
+  },
+  {
+    "slug": "放大效应",
+    "title": "放大效应",
+    "type": "概念",
+    "refs": 6
+  },
+  {
+    "slug": "杰能科",
+    "title": "杰能科",
+    "type": "公司",
+    "refs": 6
+  },
+  {
+    "slug": "淀粉糖",
+    "title": "淀粉糖",
+    "type": "行业",
+    "refs": 6
+  },
+  {
+    "slug": "生物发酵",
+    "title": "生物发酵",
+    "type": "行业",
+    "refs": 6
+  },
+  {
+    "slug": "知奥",
+    "title": "知奥",
+    "type": "产品",
+    "refs": 6
+  },
+  {
+    "slug": "稳定币",
+    "title": "稳定币",
+    "type": "技术",
+    "refs": 6
+  },
+  {
+    "slug": "糖源之战II系列",
+    "title": "糖源之战II系列",
+    "type": "行业",
+    "refs": 6
+  },
+  {
+    "slug": "诺维信",
+    "title": "诺维信",
+    "type": "公司",
+    "refs": 6
+  },
+  {
+    "slug": "CJ",
+    "title": "CJ",
+    "type": "公司",
+    "refs": 5
+  },
+  {
+    "slug": "Claude",
+    "title": "Claude",
+    "type": "技术",
+    "refs": 5
+  },
+  {
+    "slug": "OpenAI",
+    "title": "OpenAI",
+    "type": "公司",
+    "refs": 5
+  },
+  {
+    "slug": "中科院微生物所",
+    "title": "中科院微生物所",
+    "type": "公司",
+    "refs": 5
+  },
+  {
+    "slug": "以太坊",
+    "title": "以太坊",
+    "type": "产品",
+    "refs": 5
+  },
+  {
+    "slug": "价值投资",
+    "title": "价值投资",
+    "type": "技术",
+    "refs": 5
+  },
+  {
+    "slug": "刘慈欣",
+    "title": "刘慈欣",
+    "type": "人物",
+    "refs": 5
+  },
+  {
+    "slug": "区块链",
+    "title": "区块链",
+    "type": "技术",
+    "refs": 5
+  },
+  {
+    "slug": "反脆弱",
+    "title": "反脆弱",
+    "type": "感悟",
+    "refs": 5
+  },
+  {
+    "slug": "反馈抑制",
+    "title": "反馈抑制",
+    "type": "技术",
+    "refs": 5
+  },
+  {
+    "slug": "发酵培养基",
+    "title": "发酵培养基",
+    "type": "行业",
+    "refs": 5
+  },
+  {
+    "slug": "味精",
+    "title": "味精",
+    "type": "行业",
+    "refs": 5
+  },
+  {
+    "slug": "囚徒困境",
+    "title": "囚徒困境",
+    "type": "管理",
+    "refs": 5
+  },
+  {
+    "slug": "安迪苏",
+    "title": "安迪苏",
+    "type": "公司",
+    "refs": 5
+  },
+  {
+    "slug": "山东瀚霖",
+    "title": "山东瀚霖",
+    "type": "公司",
+    "refs": 5
+  },
+  {
+    "slug": "标普500",
+    "title": "标普500",
+    "type": "行业",
+    "refs": 5
+  },
+  {
+    "slug": "段永平",
+    "title": "段永平",
+    "type": "人物",
+    "refs": 5
+  },
+  {
+    "slug": "液化",
+    "title": "液化",
+    "type": "技术",
+    "refs": 5
+  },
+  {
+    "slug": "特斯拉",
+    "title": "特斯拉",
+    "type": "公司",
+    "refs": 5
+  },
+  {
+    "slug": "现金流象限",
+    "title": "现金流象限",
+    "type": "管理",
+    "refs": 5
+  },
+  {
+    "slug": "私钥",
+    "title": "私钥",
+    "type": "技术",
+    "refs": 5
+  },
+  {
+    "slug": "精氨酸",
+    "title": "精氨酸",
+    "type": "产品",
+    "refs": 5
+  },
+  {
+    "slug": "糖化",
+    "title": "糖化",
+    "type": "技术",
+    "refs": 5
+  },
+  {
+    "slug": "耐高温淀粉酶",
+    "title": "耐高温淀粉酶",
+    "type": "技术",
+    "refs": 5
+  },
+  {
+    "slug": "长链二元酸",
+    "title": "长链二元酸",
+    "type": "技术",
+    "refs": 5
+  },
+  {
+    "slug": "A股",
+    "title": "A股",
+    "type": "行业",
+    "refs": 4
+  },
+  {
+    "slug": "CRISPR",
+    "title": "CRISPR",
+    "type": "技术",
+    "refs": 4
+  },
+  {
+    "slug": "Codex",
+    "title": "Codex",
+    "type": "产品",
+    "refs": 4
+  },
+  {
+    "slug": "DCS",
+    "title": "DCS",
+    "type": "技术",
+    "refs": 4
+  },
+  {
+    "slug": "GitHub",
+    "title": "GitHub",
+    "type": "产品",
+    "refs": 4
+  },
+  {
+    "slug": "Keep",
+    "title": "Keep",
+    "type": "产品",
+    "refs": 4
+  },
+  {
+    "slug": "Kimi",
+    "title": "Kimi",
+    "type": "产品",
+    "refs": 4
+  },
+  {
+    "slug": "SOP",
+    "title": "SOP",
+    "type": "管理",
+    "refs": 4
+  },
+  {
+    "slug": "Termamyl",
+    "title": "Termamyl",
+    "type": "产品",
+    "refs": 4
+  },
+  {
+    "slug": "USDC",
+    "title": "USDC",
+    "type": "产品",
+    "refs": 4
+  },
+  {
+    "slug": "α-淀粉酶",
+    "title": "α-淀粉酶",
+    "type": "技术",
+    "refs": 4
+  },
+  {
+    "slug": "做课的方法",
+    "title": "做课的方法",
+    "type": "产品",
+    "refs": 4
+  },
+  {
+    "slug": "刘润",
+    "title": "刘润",
+    "type": "人物",
+    "refs": 4
+  },
+  {
+    "slug": "博亚和讯",
+    "title": "博亚和讯",
+    "type": "公司",
+    "refs": 4
+  },
+  {
+    "slug": "去中心化",
+    "title": "去中心化",
+    "type": "技术",
+    "refs": 4
+  },
+  {
+    "slug": "反倾销税",
+    "title": "反倾销税",
+    "type": "行业",
+    "refs": 4
+  },
+  {
+    "slug": "发酵放大",
+    "title": "发酵放大",
+    "type": "技术",
+    "refs": 4
+  },
+  {
+    "slug": "发酵法",
+    "title": "发酵法",
+    "type": "技术",
+    "refs": 4
+  },
+  {
+    "slug": "吴军",
+    "title": "吴军",
+    "type": "人物",
+    "refs": 4
+  },
+  {
+    "slug": "和菜头",
+    "title": "和菜头",
+    "type": "人物",
+    "refs": 4
+  },
+  {
+    "slug": "噬菌体",
+    "title": "噬菌体",
+    "type": "技术",
+    "refs": 4
+  },
+  {
+    "slug": "地衣芽孢杆菌",
+    "title": "地衣芽孢杆菌",
+    "type": "技术",
+    "refs": 4
+  },
+  {
+    "slug": "多巴胺",
+    "title": "多巴胺",
+    "type": "技术",
+    "refs": 4
+  },
+  {
+    "slug": "宁夏中科生物",
+    "title": "宁夏中科生物",
+    "type": "公司",
+    "refs": 4
+  },
+  {
+    "slug": "富爸爸穷爸爸",
+    "title": "富爸爸穷爸爸",
+    "type": "产品",
+    "refs": 4
+  },
+  {
+    "slug": "异亮氨酸",
+    "title": "异亮氨酸",
+    "type": "行业",
+    "refs": 4
+  },
+  {
+    "slug": "成本决胜系列",
+    "title": "成本决胜系列",
+    "type": "管理",
+    "refs": 4
+  },
+  {
+    "slug": "技术秘密",
+    "title": "技术秘密",
+    "type": "概念",
+    "refs": 4
+  },
+  {
+    "slug": "指数基金",
+    "title": "指数基金",
+    "type": "技术",
+    "refs": 4
+  },
+  {
+    "slug": "损失厌恶",
+    "title": "损失厌恶",
+    "type": "技术",
+    "refs": 4
+  },
+  {
+    "slug": "日更",
+    "title": "日更",
+    "type": "感悟",
+    "refs": 4
+  },
+  {
+    "slug": "氨基酸进化系列",
+    "title": "氨基酸进化系列",
+    "type": "产品",
+    "refs": 4
+  },
+  {
+    "slug": "玉米深加工",
+    "title": "玉米深加工",
+    "type": "行业",
+    "refs": 4
+  },
+  {
+    "slug": "王志洲",
+    "title": "王志洲",
+    "type": "人物",
+    "refs": 4
+  },
+  {
+    "slug": "糊化",
+    "title": "糊化",
+    "type": "技术",
+    "refs": 4
+  },
+  {
+    "slug": "糖源之战",
+    "title": "糖源之战",
+    "type": "行业",
+    "refs": 4
+  },
+  {
+    "slug": "美联储",
+    "title": "美联储",
+    "type": "行业",
+    "refs": 4
+  },
+  {
+    "slug": "腾讯元宝",
+    "title": "腾讯元宝",
+    "type": "产品",
+    "refs": 4
+  },
+  {
+    "slug": "认证曲线",
+    "title": "认证曲线",
+    "type": "概念",
+    "refs": 4
+  },
+  {
+    "slug": "豆包",
+    "title": "豆包",
+    "type": "产品",
+    "refs": 4
+  },
+  {
+    "slug": "财富资产",
+    "title": "财富资产",
+    "type": "感悟",
+    "refs": 4
+  },
+  {
+    "slug": "通往财富自由之路",
+    "title": "通往财富自由之路",
+    "type": "产品",
+    "refs": 4
+  },
+  {
+    "slug": "青霉素",
+    "title": "青霉素",
+    "type": "产品",
+    "refs": 4
+  },
+  {
+    "slug": "饲料添加剂",
+    "title": "饲料添加剂",
+    "type": "技术",
+    "refs": 4
+  },
+  {
+    "slug": "黄原胶",
+    "title": "黄原胶",
+    "type": "产品",
+    "refs": 4
+  },
+  {
+    "slug": "黄金",
+    "title": "黄金",
+    "type": "产品",
+    "refs": 4
+  },
+  {
+    "slug": "AI应用",
+    "title": "AI应用",
+    "type": "技术",
+    "refs": 3
+  },
+  {
+    "slug": "API",
+    "title": "API",
+    "type": "技术",
+    "refs": 3
+  },
+  {
+    "slug": "Anthropic",
+    "title": "Anthropic",
+    "type": "公司",
+    "refs": 3
+  },
+  {
+    "slug": "BCAA",
+    "title": "BCAA",
+    "type": "技术",
+    "refs": 3
+  },
+  {
+    "slug": "CJ第一制糖",
+    "title": "CJ第一制糖",
+    "type": "公司",
+    "refs": 3
+  },
+  {
+    "slug": "Circle",
+    "title": "Circle",
+    "type": "公司",
+    "refs": 3
+  },
+  {
+    "slug": "Crypto",
+    "title": "Crypto",
+    "type": "行业",
+    "refs": 3
+  },
+  {
+    "slug": "ESG",
+    "title": "ESG",
+    "type": "管理",
+    "refs": 3
+  },
+  {
+    "slug": "Eurolysine",
+    "title": "Eurolysine",
+    "type": "公司",
+    "refs": 3
+  },
+  {
+    "slug": "NotebookLM",
+    "title": "NotebookLM",
+    "type": "产品",
+    "refs": 3
+  },
+  {
+    "slug": "Polymarket",
+    "title": "Polymarket",
+    "type": "产品",
+    "refs": 3
+  },
+  {
+    "slug": "TCA循环",
+    "title": "TCA循环",
+    "type": "技术",
+    "refs": 3
+  },
+  {
+    "slug": "Transformer",
+    "title": "Transformer",
+    "type": "技术",
+    "refs": 3
+  },
+  {
+    "slug": "kLa",
+    "title": "kLa",
+    "type": "技术",
+    "refs": 3
+  },
+  {
+    "slug": "乔布斯",
+    "title": "乔布斯",
+    "type": "人物",
+    "refs": 3
+  },
+  {
+    "slug": "产能过剩",
+    "title": "产能过剩",
+    "type": "行业",
+    "refs": 3
+  },
+  {
+    "slug": "亨利定律",
+    "title": "亨利定律",
+    "type": "技术",
+    "refs": 3
+  },
+  {
+    "slug": "仓位管理",
+    "title": "仓位管理",
+    "type": "管理",
+    "refs": 3
+  },
+  {
+    "slug": "厌氧发酵",
+    "title": "厌氧发酵",
+    "type": "技术",
+    "refs": 3
+  },
+  {
+    "slug": "原生家庭",
+    "title": "原生家庭",
+    "type": "感悟",
+    "refs": 3
+  },
+  {
+    "slug": "发酵工艺",
+    "title": "发酵工艺",
+    "type": "技术",
+    "refs": 3
+  },
+  {
+    "slug": "商业秘密",
+    "title": "商业秘密",
+    "type": "行业",
+    "refs": 3
+  },
+  {
+    "slug": "复利效应",
+    "title": "复利效应",
+    "type": "技术",
+    "refs": 3
+  },
+  {
+    "slug": "复盘",
+    "title": "复盘",
+    "type": "管理",
+    "refs": 3
+  },
+  {
+    "slug": "大语言模型",
+    "title": "大语言模型",
+    "type": "技术",
+    "refs": 3
+  },
+  {
+    "slug": "完美主义",
+    "title": "完美主义",
+    "type": "感悟",
+    "refs": 3
+  },
+  {
+    "slug": "定投策略",
+    "title": "定投策略",
+    "type": "管理",
+    "refs": 3
+  },
+  {
+    "slug": "工业发酵",
+    "title": "工业发酵",
+    "type": "技术",
+    "refs": 3
+  },
+  {
+    "slug": "币安",
+    "title": "币安",
+    "type": "公司",
+    "refs": 3
+  },
+  {
+    "slug": "希杰CJ",
+    "title": "希杰CJ",
+    "type": "公司",
+    "refs": 3
+  },
+  {
+    "slug": "张树政",
+    "title": "张树政",
+    "type": "人物",
+    "refs": 3
+  },
+  {
+    "slug": "张爱玲",
+    "title": "张爱玲",
+    "type": "人物",
+    "refs": 3
+  },
+  {
+    "slug": "张雪峰",
+    "title": "张雪峰",
+    "type": "人物",
+    "refs": 3
+  },
+  {
+    "slug": "徐周文",
+    "title": "徐周文",
+    "type": "人物",
+    "refs": 3
+  },
+  {
+    "slug": "得到App",
+    "title": "得到App",
+    "type": "产品",
+    "refs": 3
+  },
+  {
+    "slug": "德鲁克",
+    "title": "德鲁克",
+    "type": "人物",
+    "refs": 3
+  },
+  {
+    "slug": "投资",
+    "title": "投资",
+    "type": "技术",
+    "refs": 3
+  },
+  {
+    "slug": "投资者情绪周期",
+    "title": "投资者情绪周期",
+    "type": "感悟",
+    "refs": 3
+  },
+  {
+    "slug": "提示词工程",
+    "title": "提示词工程",
+    "type": "技术",
+    "refs": 3
+  },
+  {
+    "slug": "新希望",
+    "title": "新希望",
+    "type": "公司",
+    "refs": 3
+  },
+  {
+    "slug": "新疆",
+    "title": "新疆",
+    "type": "行业",
+    "refs": 3
+  },
+  {
+    "slug": "有氧运动",
+    "title": "有氧运动",
+    "type": "技术",
+    "refs": 3
+  },
+  {
+    "slug": "权限边界",
+    "title": "权限边界",
+    "type": "概念",
+    "refs": 3
+  },
+  {
+    "slug": "查理·芒格",
+    "title": "查理·芒格",
+    "type": "人物",
+    "refs": 3
+  },
+  {
+    "slug": "江南大学",
+    "title": "江南大学",
+    "type": "行业",
+    "refs": 3
+  },
+  {
+    "slug": "池田菊苗",
+    "title": "池田菊苗",
+    "type": "人物",
+    "refs": 3
+  },
+  {
+    "slug": "沪深300",
+    "title": "沪深300",
+    "type": "产品",
+    "refs": 3
+  },
+  {
+    "slug": "法币贬值",
+    "title": "法币贬值",
+    "type": "感悟",
+    "refs": 3
+  },
+  {
+    "slug": "注意力经济",
+    "title": "注意力经济",
+    "type": "行业",
+    "refs": 3
+  },
+  {
+    "slug": "淀粉工业",
+    "title": "淀粉工业",
+    "type": "行业",
+    "refs": 3
+  },
+  {
+    "slug": "热环流工艺",
+    "title": "热环流工艺",
+    "type": "概念",
+    "refs": 3
+  },
+  {
+    "slug": "热电联产",
+    "title": "热电联产",
+    "type": "技术",
+    "refs": 3
+  },
+  {
+    "slug": "熵增",
+    "title": "熵增",
+    "type": "技术",
+    "refs": 3
+  },
+  {
+    "slug": "牧原股份",
+    "title": "牧原股份",
+    "type": "公司",
+    "refs": 3
+  },
+  {
+    "slug": "特朗普",
+    "title": "特朗普",
+    "type": "人物",
+    "refs": 3
+  },
+  {
+    "slug": "玉米蛋白粉",
+    "title": "玉米蛋白粉",
+    "type": "产品",
+    "refs": 3
+  },
+  {
+    "slug": "百年味之素系列",
+    "title": "百年味之素系列",
+    "type": "行业",
+    "refs": 3
+  },
+  {
+    "slug": "碱法提取工艺",
+    "title": "碱法提取工艺",
+    "type": "技术",
+    "refs": 3
+  },
+  {
+    "slug": "碳能解偶联",
+    "title": "碳能解偶联",
+    "type": "技术",
+    "refs": 3
+  },
+  {
+    "slug": "糖酸转化率",
+    "title": "糖酸转化率",
+    "type": "技术",
+    "refs": 3
+  },
+  {
+    "slug": "罗振宇",
+    "title": "罗振宇",
+    "type": "人物",
+    "refs": 3
+  },
+  {
+    "slug": "美元",
+    "title": "美元",
+    "type": "行业",
+    "refs": 3
+  },
+  {
+    "slug": "腾讯",
+    "title": "腾讯",
+    "type": "公司",
+    "refs": 3
+  },
+  {
+    "slug": "自我认知",
+    "title": "自我认知",
+    "type": "感悟",
+    "refs": 3
+  },
+  {
+    "slug": "自然语言编程",
+    "title": "自然语言编程",
+    "type": "技术",
+    "refs": 3
+  },
+  {
+    "slug": "菌种室",
+    "title": "菌种室",
+    "type": "技术",
+    "refs": 3
+  },
+  {
+    "slug": "葡萄糖",
+    "title": "葡萄糖",
+    "type": "技术",
+    "refs": 3
+  },
+  {
+    "slug": "蚂蚁的逆袭",
+    "title": "蚂蚁的逆袭",
+    "type": "感悟",
+    "refs": 3
+  },
+  {
+    "slug": "认知偏差",
+    "title": "认知偏差",
+    "type": "技术",
+    "refs": 3
+  },
+  {
+    "slug": "认知升级",
+    "title": "认知升级",
+    "type": "感悟",
+    "refs": 3
+  },
+  {
+    "slug": "认知变现",
+    "title": "认知变现",
+    "type": "感悟",
+    "refs": 3
+  },
+  {
+    "slug": "诺伟司",
+    "title": "诺伟司",
+    "type": "公司",
+    "refs": 3
+  },
+  {
+    "slug": "读者选题",
+    "title": "读者选题",
+    "type": "管理",
+    "refs": 3
+  },
+  {
+    "slug": "谷氨酸棒状杆菌",
+    "title": "谷氨酸棒状杆菌",
+    "type": "技术",
+    "refs": 3
+  },
+  {
+    "slug": "负熵",
+    "title": "负熵",
+    "type": "技术",
+    "refs": 3
+  },
+  {
+    "slug": "资产配置",
+    "title": "资产配置",
+    "type": "管理",
+    "refs": 3
+  },
+  {
+    "slug": "进化论",
+    "title": "进化论",
+    "type": "技术",
+    "refs": 3
+  },
+  {
+    "slug": "进通节堵出",
+    "title": "进通节堵出",
+    "type": "技术",
+    "refs": 3
+  },
+  {
+    "slug": "通货膨胀",
+    "title": "通货膨胀",
+    "type": "行业",
+    "refs": 3
+  },
+  {
+    "slug": "酶法湿磨",
+    "title": "酶法湿磨",
+    "type": "技术",
+    "refs": 3
+  },
+  {
+    "slug": "闫晓林",
+    "title": "闫晓林",
+    "type": "人物",
+    "refs": 3
+  },
+  {
+    "slug": "阜丰",
+    "title": "阜丰",
+    "type": "公司",
+    "refs": 3
+  },
+  {
+    "slug": "陈海贤",
+    "title": "陈海贤",
+    "type": "人物",
+    "refs": 3
+  },
+  {
+    "slug": "陈远童",
+    "title": "陈远童",
+    "type": "人物",
+    "refs": 3
+  },
+  {
+    "slug": "霍尔木兹海峡",
+    "title": "霍尔木兹海峡",
+    "type": "行业",
+    "refs": 3
+  },
+  {
+    "slug": "非洲猪瘟",
+    "title": "非洲猪瘟",
+    "type": "行业",
+    "refs": 3
+  },
+  {
+    "slug": "预测市场",
+    "title": "预测市场",
+    "type": "技术",
+    "refs": 3
+  },
+  {
+    "slug": "高峰让吉",
+    "title": "高峰让吉",
+    "type": "人物",
+    "refs": 3
+  },
+  {
+    "slug": "鲁棒性",
+    "title": "鲁棒性",
+    "type": "技术",
+    "refs": 3
+  },
+  {
+    "slug": "为行业写史",
+    "title": "为行业写史",
+    "type": "概念",
+    "refs": 2
+  },
+  {
+    "slug": "不败结构",
+    "title": "不败结构",
+    "type": "概念",
+    "refs": 1
+  }
+]

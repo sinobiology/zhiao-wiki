@@ -7,19 +7,26 @@ const route  = useRoute()
 const router = useRouter()
 const md = new MarkdownIt({ html: false, linkify: true, breaks: true })
 
-const meta      = ref({})
-const content   = ref('')
-const loading   = ref(true)
-const wikiIndex = ref([])
+const meta        = ref({})
+const content     = ref('')
+const loading     = ref(true)
+const wikiIndex   = ref([])
+// 实体页名集合：[[wikilink]] 只有命中这里（或文章）才跳得过去
+const entitySlugs = ref(new Set())
 
 const TYPE_COLORS = {
-  '技术': '#3B7DD8', '行业': '#47956A', '管理': '#7E5FAD', '感悟': '#C5961B', '产品': '#C2604A'
+  '技术': '#3B7DD8', '行业': '#47956A', '管理': '#7E5FAD', '感悟': '#C5961B',
+  '产品': '#C2604A', '公司': '#5B8C6E', '人物': '#B07A3C'
 }
 
 onMounted(async () => {
   try {
     wikiIndex.value = await fetch('/data/wiki-index.json').then(r => r.json())
   } catch { /* 加载失败时忽略，导航降级为 alert */ }
+  try {
+    const ents = await fetch('/data/entity-index.json').then(r => r.json())
+    entitySlugs.value = new Set(ents.map(e => e.slug))
+  } catch { /* 无实体索引时只按文章匹配 */ }
 })
 
 function parseFrontmatter(text) {
@@ -65,11 +72,17 @@ function findSlugByName(name) {
 }
 
 function navigateToEntity(name) {
+  // 1. 优先命中实体页（wiki/entities/<名>.md 已复制到 /data/pages/）
+  if (entitySlugs.value.has(name)) {
+    router.push('/page/' + encodeURIComponent(name))
+    return
+  }
+  // 2. 回落：按文章 slug / 标题匹配
   const slug = findSlugByName(name)
   if (slug) {
     router.push('/page/' + slug)
   } else {
-    alert(`未找到与"${name}"相关的文章`)
+    alert(`「${name}」暂无独立页面`)
   }
 }
 
@@ -89,7 +102,8 @@ const renderedHtml = computed(() => {
 const typeBadgeColor = computed(() => TYPE_COLORS[meta.value.type] || '#999')
 
 const categoryName = computed(() => {
-  const map = { '技术': '技术与发酵', '行业': '行业分析', '管理': '管理逻辑', '感悟': '个人感悟', '产品': '产品专题' }
+  const map = { '技术': '技术与发酵', '行业': '行业分析', '管理': '管理逻辑', '感悟': '个人感悟',
+                '产品': '产品专题', '公司': '公司机构', '人物': '人物' }
   return map[meta.value.type] || meta.value.type || '文章'
 })
 

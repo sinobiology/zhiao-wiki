@@ -25,6 +25,7 @@ ingest.py — 知奥ZHAO 知识库生成脚本（DeepSeek 版）
 
 import os
 import re
+import sys
 import json
 import time
 import argparse
@@ -282,9 +283,12 @@ def main():
     args = parser.parse_args()
 
     if not API_KEY:
-        print("错误：未找到 API Key")
-        print("  设置 DEEPSEEK_API_KEY，或确认 ~/.hermes/.env 中存在该变量")
-        return
+        # 必须以非零码退出：否则 CI 里 key 缺失会让整条流水线「绿灯空转」，
+        # 表面成功、实际一篇摘要都不会生成，极难察觉。
+        print("错误：未找到 API Key —— DEEPSEEK_API_KEY 为空", file=sys.stderr)
+        print("  本地：export DEEPSEEK_API_KEY=... 或确认 ~/.hermes/.env 已配置", file=sys.stderr)
+        print("  CI：仓库 Settings → Secrets and variables → Actions 添加 DEEPSEEK_API_KEY", file=sys.stderr)
+        sys.exit(1)
 
     print(f"模型：{MODEL} @ {BASE_URL} | 思考：{THINKING} | max_tokens：{MAX_TOKENS}\n")
 

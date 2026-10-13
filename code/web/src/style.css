@@ -315,6 +315,12 @@ body { background: #E8E6E1; }
 .chat-bubble-user { background: var(--accent); color: #fff; border-radius: 18px 18px 6px 18px; }
 .chat-bubble-ai   { background: var(--bg-secondary); color: var(--text-primary); border-radius: 18px 18px 18px 6px; }
 
+/* ── 视图滚动容器 ──
+   .main-content 是固定高度的 app shell（height:100vh + overflow:hidden），
+   因此每个「普通文档流」视图的根元素必须自建滚动容器，否则内容会被裁掉、页面滑不动。
+   （图谱、对话两页自带满高布局，不需要这个类。） */
+.scroll-view { flex: 1; min-height: 0; overflow-y: auto; }
+
 /* ── 通用工具 ── */
 .page-wrap { padding: 24px 36px; }
 .flex { display: flex; }

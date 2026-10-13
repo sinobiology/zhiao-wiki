@@ -3,7 +3,20 @@ name: 自动更新知识库
 on:
   push:
     paths:
+      # 新增原文 → 生成摘要 → 打包数据 → 部署
       - 'raw/articles/**'
+      # 前端与后端源码改动同样需要重新构建部署
+      # ⚠️ 切勿把 wiki/** 或 code/web/public/** 加进来：本工作流结束时会提交这两个目录，
+      #    一旦纳入触发路径就会自触发，形成无限循环。
+      - 'code/web/src/**'
+      - 'code/web/index.html'
+      - 'code/web/server.js'
+      - 'code/web/package.json'
+      - 'code/web/vite.config.js'
+      - 'code/web/Dockerfile'
+      - 'code/web/fly.toml'
+      - 'code/web/scripts/build-data.py'
+      - 'code/ingest.py'
       - '.github/workflows/update-wiki.yml'
   workflow_dispatch:  # 允许手动触发
 

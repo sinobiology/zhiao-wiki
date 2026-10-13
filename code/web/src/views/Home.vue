@@ -124,7 +124,7 @@ onMounted(loadData)
 </script>
 
 <template>
-  <div>
+  <div class="scroll-view">
     <!-- Hero -->
     <div class="hero" style="display:flex;align-items:center;justify-content:space-between">
       <div>

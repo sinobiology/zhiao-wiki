@@ -134,7 +134,7 @@ watch(() => route.params.slug, s => s && load(s), { immediate: true })
 </script>
 
 <template>
-  <div>
+  <div class="scroll-view">
     <!-- 面包屑 -->
     <div class="breadcrumb">
       <a @click.prevent="router.push('/')">首页</a>

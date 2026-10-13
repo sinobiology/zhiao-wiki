@@ -31,7 +31,7 @@ watch(() => route.params.type, loadIndex, { immediate: true })
 </script>
 
 <template>
-  <div>
+  <div class="scroll-view">
     <div class="page-hero" style="padding:24px 36px">
       <div style="font-size:12px;color:rgba(255,255,255,0.5);margin-bottom:6px">分类</div>
       <h1 style="font-size:24px">{{ label }}</h1>

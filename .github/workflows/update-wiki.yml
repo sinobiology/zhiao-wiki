@@ -23,6 +23,14 @@ on:
 permissions:
   contents: write
 
+# 同一时间只允许一个知识库更新任务。
+# 不加这行时，短时间内触发两次（或上一次的自动提交还没落地）会出现两个构建
+# 同时在「提交更新」步 push，后者必然 non-fast-forward 失败，在 Actions 里留个红叉。
+# cancel-in-progress 保持 false：宁可排队，也不要打断正在进行中的部署。
+concurrency:
+  group: update-wiki
+  cancel-in-progress: false
+
 jobs:
   update-wiki:
     runs-on: ubuntu-latest

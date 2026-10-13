@@ -141,7 +141,7 @@ watch(() => route.params.slug, s => s && load(s), { immediate: true })
       <span>/</span>
       <a v-if="meta.type" @click.prevent="router.push('/category/' + meta.type)">{{ categoryName }}</a>
       <span v-if="meta.type">/</span>
-      <span>{{ meta.title || route.params.slug }}</span>
+      <span class="crumb-current">{{ meta.title || route.params.slug }}</span>
     </div>
 
     <!-- 页面 Hero -->

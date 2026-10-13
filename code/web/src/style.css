@@ -39,6 +39,7 @@
   --radius-lg: 16px;
   --radius-pill: 20px;
   --sidebar-width: 250px;
+  --topbar-h: 52px;          /* 窄屏顶栏高度，正文需让出这段 */
 
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Hiragino Sans GB", sans-serif;
   font-size: 14px;
@@ -280,6 +281,10 @@ body { background: #E8E6E1; }
 
 /* ── 详情页 ── */
 .breadcrumb { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--text-secondary); padding: 16px 36px; }
+.breadcrumb > * { white-space: nowrap; }
+/* 末段是文章标题，可能很长：占据剩余宽度并省略号截断，
+   否则 flex 会把标题逐字断行（窄屏下尤其难看） */
+.breadcrumb .crumb-current { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
 .breadcrumb a { color: var(--accent); text-decoration: none; }
 .breadcrumb a:hover { text-decoration: underline; }
 
@@ -312,6 +317,8 @@ body { background: #E8E6E1; }
 .prose strong { color: var(--text-primary); font-weight: 600; }
 
 /* ── 聊天 ── */
+.chat-body  { padding: 24px 36px; }
+.chat-input { padding: 16px 36px; }
 .chat-bubble-user { background: var(--accent); color: #fff; border-radius: 18px 18px 6px 18px; }
 .chat-bubble-ai   { background: var(--bg-secondary); color: var(--text-primary); border-radius: 18px 18px 18px 6px; }
 
@@ -329,3 +336,95 @@ body { background: #E8E6E1; }
 .text-sm { font-size: 13px; }
 .text-xs { font-size: 11px; }
 .text-secondary { color: var(--text-secondary); }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   窄屏（手机 / 小平板）：侧栏改为抽屉
+   ──────────────────────────────────────────────────────────────────────────
+   宽屏下侧栏常驻；窄屏下固定 250px 会把屏幕吃掉大半（375px 屏只剩 125px 给正文），
+   故改为屏外抽屉：默认 translateX(-100%)，点顶栏汉堡滑入，遮罩或跳转后自动收起。
+   顶栏与遮罩用 fixed 定位 —— 它们也是 #app(flex) 的子元素，留在文档流里会挤坏布局。
+   ══════════════════════════════════════════════════════════════════════════ */
+.mobile-topbar,
+.sidebar-backdrop,
+.sidebar-close { display: none; }
+
+@media (max-width: 900px) {
+  .sidebar {
+    width: min(280px, 82vw);
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+    z-index: 170;
+  }
+  .sidebar.open { transform: translateX(0); box-shadow: var(--shadow-lg); }
+
+  .main-content {
+    margin-left: 0;
+    width: 100vw;
+    padding-top: var(--topbar-h);
+  }
+
+  .sidebar-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+    z-index: 160;
+  }
+  .sidebar-backdrop.show { opacity: 1; pointer-events: auto; }
+
+  .mobile-topbar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: var(--topbar-h);
+    padding: 0 12px;
+    background: var(--sidebar-bg);
+    border-bottom: 1px solid var(--sidebar-border);
+    z-index: 150;
+  }
+  .nav-toggle {
+    width: 36px; height: 36px;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 4px;
+    padding: 0;
+    background: transparent; border: none; cursor: pointer;
+    flex-shrink: 0;
+  }
+  .nav-toggle span { display: block; width: 18px; height: 2px; background: var(--sidebar-text); border-radius: 1px; }
+  .mobile-title { color: #fff; font-size: 15px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.25; cursor: pointer; }
+  .mobile-title span { display: block; font-size: 10px; font-weight: 400; letter-spacing: 0; color: var(--sidebar-text-secondary); }
+
+  .sidebar-close {
+    display: flex; align-items: center; justify-content: center;
+    position: absolute; top: 14px; right: 10px;
+    width: 30px; height: 30px;
+    background: transparent; border: none;
+    color: var(--sidebar-text-secondary);
+    font-size: 24px; line-height: 1; cursor: pointer;
+  }
+
+  /* 内容留白收紧，正文占满宽度 */
+  .hero { padding: 24px 20px; }
+  .hero h1 { font-size: 19px; }
+  .page-hero { padding: 20px !important; }
+  .page-hero h1 { font-size: 20px; }
+  .breadcrumb { padding: 12px 20px; }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 20px; }
+  .search-wrap { padding: 0 20px 16px; }
+  .section { padding: 0 20px 20px; }
+  .section-block { padding: 18px 16px; }
+  .page-wrap { padding: 20px; }
+  .prose { padding: 20px; }
+  .prose h2 { font-size: 16px; }
+
+  .chat-body { padding: 16px !important; }
+  .chat-input { padding: 12px 16px !important; }
+
+  .hero-mini-graph { display: none; }
+}

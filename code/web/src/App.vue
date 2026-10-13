@@ -1,4 +1,5 @@
 <script setup>
+import { ref, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 const router = useRouter()
 const route  = useRoute()
@@ -12,18 +13,43 @@ const types = [
 ]
 
 const isActive = (path) => route.path === path || route.path.startsWith(path + '/')
+
+// 窄屏抽屉：宽屏下这份状态无效（侧栏由 CSS 常驻显示）
+const drawerOpen = ref(false)
+function go(path) {
+  drawerOpen.value = false
+  router.push(path)
+}
+// 兜底：任何来源的跳转（含正文里的内链）都自动收起抽屉
+watch(() => route.path, () => { drawerOpen.value = false })
 </script>
 
 <template>
   <div id="app">
-    <!-- 侧边栏 -->
-    <aside class="sidebar">
-      <div class="sidebar-logo" @click="router.push('/')">
+    <!-- 窄屏顶栏（宽屏由媒体查询隐藏） -->
+    <header class="mobile-topbar">
+      <button class="nav-toggle" aria-label="打开导航" @click="drawerOpen = true">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="mobile-title" @click="go('/')">
+        知奥ZHAO 知识库
+        <span>工业生物技术数字大脑</span>
+      </div>
+    </header>
+
+    <!-- 抽屉遮罩 -->
+    <div class="sidebar-backdrop" :class="{ show: drawerOpen }" @click="drawerOpen = false"></div>
+
+    <!-- 侧边栏：宽屏常驻，窄屏为抽屉 -->
+    <aside class="sidebar" :class="{ open: drawerOpen }">
+      <button class="sidebar-close" aria-label="收起导航" @click="drawerOpen = false">×</button>
+
+      <div class="sidebar-logo" @click="go('/')">
         知奥ZHAO 知识库
         <span>工业生物技术数字大脑</span>
       </div>
 
-      <a class="nav-item" :class="{ active: route.path === '/' }" @click.prevent="router.push('/')">
+      <a class="nav-item" :class="{ active: route.path === '/' }" @click.prevent="go('/')">
         🏠 知识库首页
       </a>
 
@@ -32,18 +58,18 @@ const isActive = (path) => route.path === path || route.path.startsWith(path + '
         v-for="t in types" :key="t.key"
         class="nav-item"
         :class="{ active: route.path === '/category/' + t.key }"
-        @click.prevent="router.push('/category/' + t.key)"
+        @click.prevent="go('/category/' + t.key)"
       >
         {{ t.icon }} {{ t.label }}
       </a>
 
       <div class="nav-label">工具</div>
-      <a class="nav-item" :class="{ active: route.path === '/graph' }" @click.prevent="router.push('/graph')">
+      <a class="nav-item" :class="{ active: route.path === '/graph' }" @click.prevent="go('/graph')">
         🕸️ 知识图谱
       </a>
 
       <div class="sidebar-footer">
-        <a class="ai-btn" @click.prevent="router.push('/chat')">
+        <a class="ai-btn" @click.prevent="go('/chat')">
           🤖 AI 知奥
           <span class="new-badge">NEW</span>
         </a>

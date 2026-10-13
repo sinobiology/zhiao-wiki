@@ -130,7 +130,7 @@ onMounted(loadData)
       <div>
         <h1>知奥ZHAO：工业生物技术数字大脑</h1>
         <p>基于 Karpathy LLM Wiki 模式 · {{ wikiIndex.length }} 篇文章预编译为结构化知识</p>
-        <div style="display:flex;gap:12px;margin-top:18px">
+        <div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:18px">
           <button @click="router.push('/chat')"
             style="background:#C5961B;color:#fff;border:none;padding:9px 20px;border-radius:22px;font-size:14px;font-weight:600;cursor:pointer">
             🤖 问 AI 知奥
@@ -141,7 +141,7 @@ onMounted(loadData)
           </button>
         </div>
       </div>
-      <svg ref="miniSvg" style="flex-shrink:0;opacity:0.85"></svg>
+      <svg ref="miniSvg" class="hero-mini-graph" style="flex-shrink:0;opacity:0.85"></svg>
     </div>
 
     <!-- 统计卡片 -->

@@ -90,11 +90,11 @@ function onKeydown(e) {
 </script>
 
 <template>
-  <div style="display:flex;flex-direction:column;height:100vh;width:100%">
+  <div style="display:flex;flex-direction:column;height:100%;width:100%">
 
     <!-- 密码验证 -->
-    <div v-if="!verified" style="flex:1;display:flex;align-items:center;justify-content:center;background:var(--bg-primary)">
-      <div class="card" style="width:360px;padding:40px;text-align:center">
+    <div v-if="!verified" style="flex:1;display:flex;align-items:center;justify-content:center;background:var(--bg-primary);padding:16px">
+      <div class="card" style="width:min(360px,100%);padding:40px;text-align:center">
         <div style="font-size:40px;margin-bottom:16px">🔐</div>
         <div style="font-size:18px;font-weight:700;margin-bottom:6px">访问密码</div>
         <div style="font-size:13px;color:var(--text-secondary);margin-bottom:24px">请输入密码以访问 AI 知奥</div>
@@ -121,7 +121,7 @@ function onKeydown(e) {
       </div>
 
       <!-- 消息区 -->
-      <div style="flex:1;overflow-y:auto;padding:24px 36px;display:flex;flex-direction:column;gap:16px;background:var(--bg-primary)">
+      <div class="chat-body" style="flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:16px;background:var(--bg-primary)">
 
         <!-- 空态 -->
         <div v-if="messages.length === 0" style="text-align:center;padding:60px 0">
@@ -166,7 +166,7 @@ function onKeydown(e) {
       </div>
 
       <!-- 输入区 -->
-      <div style="padding:16px 36px;border-top:1px solid var(--border-light);background:var(--bg-tertiary);display:flex;gap:12px;align-items:flex-end">
+      <div class="chat-input" style="border-top:1px solid var(--border-light);background:var(--bg-tertiary);display:flex;gap:12px;align-items:flex-end">
         <textarea v-model="input" @keydown="onKeydown" rows="2"
           placeholder="输入问题，Enter 发送，Shift+Enter 换行..."
           style="flex:1;resize:none;border:1px solid var(--border);border-radius:22px;padding:10px 18px;font-size:14px;outline:none;font-family:inherit;transition:border-color 0.2s"

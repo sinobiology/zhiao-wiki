@@ -88,17 +88,26 @@ jobs:
 
       - name: 同步应用密钥到 Fly.io
         if: success()
-        # 线上 /api/chat 需要 DEEPSEEK_API_KEY。用 --stage 暂存，随下面的
-        # deploy 一起生效，避免额外触发一次发布。值未变化时 flyctl 无操作。
+        # 线上 /api/chat 需要 DEEPSEEK_API_KEY 与 ACCESS_PASSWORD。
+        # 用 --stage 暂存，随下面的 deploy 一起生效，避免额外触发一次发布。
+        # 值未变化时 flyctl 无操作。
+        # ⚠️ ACCESS_PASSWORD 曾经硬编码在 server.js 里（默认值 zhiao2026），
+        #    公开仓库＝公开入口，被人刷接口烧掉 300+ 元。现在只从 Secret 注入。
         run: |
           if [ -z "$DEEPSEEK_API_KEY" ]; then
             echo "::warning::未配置 DEEPSEEK_API_KEY secret，线上对话接口将不可用"
-            exit 0
+          else
+            flyctl secrets set DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" -a zhiao-wiki --stage
           fi
-          flyctl secrets set DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" -a zhiao-wiki --stage
+          if [ -z "$ACCESS_PASSWORD" ]; then
+            echo "::warning::未配置 ACCESS_PASSWORD secret，线上对话接口将保持关闭（fail-closed）"
+          else
+            flyctl secrets set ACCESS_PASSWORD="$ACCESS_PASSWORD" -a zhiao-wiki --stage
+          fi
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
           DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+          ACCESS_PASSWORD: ${{ secrets.ACCESS_PASSWORD }}
 
       - name: 执行部署
         if: success()

@@ -13,8 +13,11 @@ const DATA_DIR  = path.join(__dirname, 'public', 'data')
 const PAGES_DIR = path.join(DATA_DIR, 'pages')
 
 const app = express()
+// Fly 前面有一层反代；只信任 1 跳，req.ip 才是 Fly 看到的真实客户端 IP。
+// （不能用 true：那会信任整个 X-Forwarded-For 链，攻击者可自带伪造头绕过限流。）
+app.set('trust proxy', 1)
 app.use(cors())
-app.use(express.json())
+app.use(express.json({ limit: '64kb' }))
 
 // ── 模型配置（DeepSeek，OpenAI 兼容接口）─────────────────────────────────────
 // 只用 Node 内置 fetch，不再依赖 @anthropic-ai/sdk
@@ -24,9 +27,49 @@ const MODEL        = process.env.LLM_MODEL || 'deepseek-v4-pro'
 const THINKING_OFF = (process.env.LLM_THINKING || 'disabled').toLowerCase() === 'disabled'
 // deepseek-v4-pro / flash 均为推理模型，思考链与正文共享 max_tokens，给少会「静默返回空正文」
 const MAX_TOKENS   = Number(process.env.LLM_MAX_TOKENS || 2048)
-const PASSWORD     = process.env.ACCESS_PASSWORD || 'zhiao2026'
+// ⚠️ 绝不写默认值。口令一旦硬编码进源码，公开仓库就等于把「会扣上游费用的入口」公开。
+// 2026-10-14 教训：这里原本是 `|| 'zhiao2026'`，被人从公开仓库读到口令后刷接口，
+// 一天烧掉 300 多元。改为未配置即拒绝（fail-closed）。
+const PASSWORD     = process.env.ACCESS_PASSWORD
 
 if (!LLM_API_KEY) console.warn('⚠️  未配置 DEEPSEEK_API_KEY，/api/chat 将不可用')
+if (!PASSWORD)    console.warn('⚠️  未配置 ACCESS_PASSWORD，对话接口一律拒绝（fail-closed）')
+
+// ── 限流：防口令泄露后被当成免费 API 刷爆 ────────────────────────────────────
+const CHAT_READY = Boolean(LLM_API_KEY && PASSWORD)
+
+const buckets = new Map()   // key → number[]（命中时间戳）
+function hit(key, windowMs, max) {
+  const now = Date.now()
+  const arr = (buckets.get(key) || []).filter((t) => now - t < windowMs)
+  if (arr.length >= max) { buckets.set(key, arr); return false }
+  arr.push(now)
+  buckets.set(key, arr)
+  return true
+}
+
+const LIMITS = {
+  chat:   { windowMs: 10 * 60_000, max: Number(process.env.RATE_CHAT_MAX   || 20) },  // 每 IP，10 分钟
+  verify: { windowMs: 10 * 60_000, max: Number(process.env.RATE_VERIFY_MAX || 10) },  // 每 IP，防暴力猜口令
+}
+// 全站日调用上限：IP 可以换，这条兜底换不掉。设 0 表示不限制（不推荐）。
+const GLOBAL_DAILY_MAX = Number(process.env.RATE_DAILY_MAX || 300)
+const MSG_MAX_LEN      = Number(process.env.MSG_MAX_LEN || 500)
+
+function globalQuotaOk() {
+  if (!GLOBAL_DAILY_MAX) return true
+  return hit('__global__', 24 * 60 * 60_000, GLOBAL_DAILY_MAX)
+}
+
+// 定期清理过期桶，避免内存无限增长
+const sweeper = setInterval(() => {
+  const now = Date.now()
+  for (const [k, arr] of buckets) {
+    const kept = arr.filter((t) => now - t < 24 * 60 * 60_000)
+    kept.length ? buckets.set(k, kept) : buckets.delete(k)
+  }
+}, 30 * 60_000)
+if (sweeper.unref) sweeper.unref()
 
 // ── 启动时预加载数据 ──────────────────────────────────────────────────────────
 let wikiIndex = []
@@ -236,8 +279,12 @@ function loadPageContent(slug) {
 
 // ── API 路由 ──────────────────────────────────────────────────────────────────
 
-// 密码验证
+// 密码验证（限流，防暴力猜口令）
 app.post('/api/verify-password', (req, res) => {
+  if (!CHAT_READY) return res.status(503).json({ ok: false, error: '服务未配置访问口令' })
+  if (!hit(`verify:${req.ip}`, LIMITS.verify.windowMs, LIMITS.verify.max)) {
+    return res.status(429).json({ ok: false, error: '尝试过于频繁，请稍后再试' })
+  }
   const { password } = req.body
   if (password === PASSWORD) {
     res.json({ ok: true })
@@ -248,9 +295,21 @@ app.post('/api/verify-password', (req, res) => {
 
 // AI 知奥对话（SSE 流式）
 app.post('/api/chat', async (req, res) => {
+  if (!CHAT_READY) return res.status(503).json({ error: '对话服务未启用' })
+  // 先限流再看口令：即使口令泄露，单 IP 也有窗口上限
+  if (!hit(`chat:${req.ip}`, LIMITS.chat.windowMs, LIMITS.chat.max)) {
+    return res.status(429).json({ error: '请求过于频繁，请稍后再试' })
+  }
   const { message, history = [], password } = req.body
   if (password !== PASSWORD) return res.status(401).json({ error: '未授权' })
-  if (!message) return res.status(400).json({ error: 'message 不能为空' })
+  if (!message || typeof message !== 'string') return res.status(400).json({ error: 'message 不能为空' })
+  if (message.length > MSG_MAX_LEN) {
+    return res.status(400).json({ error: `message 过长（上限 ${MSG_MAX_LEN} 字）` })
+  }
+  // 全站日额度兜底：换 IP 也绕不过
+  if (!globalQuotaOk()) {
+    return res.status(429).json({ error: '今日全站对话额度已用尽，请明天再试' })
+  }
 
   // 检索相关页面
   const hits = retrieve(message)

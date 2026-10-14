@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import MarkdownIt from 'markdown-it'
 
 const md = new MarkdownIt({ breaks: true, linkify: true })
@@ -11,21 +11,39 @@ const messages  = ref([])
 const input     = ref('')
 const loading   = ref(false)
 
+// 口令只留在本机浏览器，不写进任何仓库文件（源码里出现口令＝入口公开）
+const PWD_KEY = 'zhiao-chat-pwd'
+
 const EXAMPLES = ['赖氨酸行业格局如何？', '发酵成本如何系统性降低？', '规模效应在氨基酸行业怎么体现？']
 
 async function verifyPassword() {
   pwdError.value = ''
-  const res = await fetch('/api/verify-password', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ password: password.value }),
-  })
-  if (res.ok) {
-    verified.value = true
-  } else {
-    pwdError.value = '密码错误，请重试'
+  try {
+    const res = await fetch('/api/verify-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: password.value }),
+    })
+    if (res.ok) {
+      verified.value = true
+      try { localStorage.setItem(PWD_KEY, password.value) } catch {}
+    } else {
+      const j = await res.json().catch(() => ({}))
+      pwdError.value = j.error || '密码错误，请重试'
+      try { localStorage.removeItem(PWD_KEY) } catch {}
+    }
+  } catch {
+    pwdError.value = '无法连接服务器，请稍后再试'
   }
 }
+
+// 本机存过口令就直接校验一次，省得每次进来都手输
+onMounted(async () => {
+  try {
+    const saved = localStorage.getItem(PWD_KEY)
+    if (saved) { password.value = saved; await verifyPassword() }
+  } catch {}
+})
 
 async function send(msg) {
   const text = (msg || input.value).trim()
@@ -47,6 +65,21 @@ async function send(msg) {
         history: messages.value.slice(-6, -1).map(m => ({ role: m.role, content: m.content })),
       }),
     })
+
+    // 限流/未授权/未配置时后端返回 JSON 而非 SSE，必须先拦下来，
+    // 否则读流拿不到 data: 行，气泡会一直转圈不报错。
+    if (!res.ok) {
+      let msg = `请求失败（HTTP ${res.status}）`
+      try { const j = await res.json(); if (j.error) msg = j.error } catch {}
+      messages.value[idx].thinking = false
+      messages.value[idx].content = msg
+      messages.value = [...messages.value]
+      if (res.status === 401) {          // 口令变了/失效，退回输入界面
+        verified.value = false
+        try { localStorage.removeItem(PWD_KEY) } catch {}
+      }
+      return
+    }
 
     const reader = res.body.getReader()
     const decoder = new TextDecoder()

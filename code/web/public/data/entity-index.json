@@ -3,7 +3,7 @@
     "slug": "规模效应",
     "title": "规模效应",
     "type": "管理",
-    "refs": 124
+    "refs": 125
   },
   {
     "slug": "赖氨酸",
@@ -15,7 +15,7 @@
     "slug": "味之素",
     "title": "味之素",
     "type": "公司",
-    "refs": 56
+    "refs": 57
   },
   {
     "slug": "梅花生物",
@@ -27,7 +27,7 @@
     "slug": "知奥ZHAO",
     "title": "知奥ZHAO",
     "type": "产品",
-    "refs": 37
+    "refs": 38
   },
   {
     "slug": "比特币",
@@ -54,16 +54,16 @@
     "refs": 30
   },
   {
+    "slug": "发酵工程",
+    "title": "发酵工程",
+    "type": "技术",
+    "refs": 26
+  },
+  {
     "slug": "阜丰集团",
     "title": "阜丰集团",
     "type": "公司",
     "refs": 26
-  },
-  {
-    "slug": "发酵工程",
-    "title": "发酵工程",
-    "type": "技术",
-    "refs": 25
   },
   {
     "slug": "氨基酸",
@@ -204,6 +204,12 @@
     "refs": 13
   },
   {
+    "slug": "凯赛生物",
+    "title": "凯赛生物",
+    "type": "公司",
+    "refs": 12
+  },
+  {
     "slug": "大成生化",
     "title": "大成生化",
     "type": "公司",
@@ -225,12 +231,6 @@
     "slug": "AI",
     "title": "AI",
     "type": "技术",
-    "refs": 11
-  },
-  {
-    "slug": "凯赛生物",
-    "title": "凯赛生物",
-    "type": "公司",
     "refs": 11
   },
   {
@@ -306,15 +306,15 @@
     "refs": 9
   },
   {
-    "slug": "万维钢",
-    "title": "万维钢",
-    "type": "人物",
-    "refs": 8
-  },
-  {
     "slug": "希杰",
     "title": "希杰",
     "type": "公司",
+    "refs": 9
+  },
+  {
+    "slug": "万维钢",
+    "title": "万维钢",
+    "type": "人物",
     "refs": 8
   },
   {
@@ -402,6 +402,12 @@
     "refs": 6
   },
   {
+    "slug": "Claude",
+    "title": "Claude",
+    "type": "技术",
+    "refs": 6
+  },
+  {
     "slug": "人机协作",
     "title": "人机协作",
     "type": "管理",
@@ -423,6 +429,12 @@
     "slug": "喷射液化器",
     "title": "喷射液化器",
     "type": "技术",
+    "refs": 6
+  },
+  {
+    "slug": "囚徒困境",
+    "title": "囚徒困境",
+    "type": "管理",
     "refs": 6
   },
   {
@@ -471,12 +483,6 @@
     "slug": "CJ",
     "title": "CJ",
     "type": "公司",
-    "refs": 5
-  },
-  {
-    "slug": "Claude",
-    "title": "Claude",
-    "type": "技术",
     "refs": 5
   },
   {
@@ -531,12 +537,6 @@
     "slug": "味精",
     "title": "味精",
     "type": "行业",
-    "refs": 5
-  },
-  {
-    "slug": "囚徒困境",
-    "title": "囚徒困境",
-    "type": "管理",
     "refs": 5
   },
   {

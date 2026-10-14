@@ -15,6 +15,13 @@ PAGES  = OUT / "pages"
 OUT.mkdir(parents=True, exist_ok=True)
 PAGES.mkdir(parents=True, exist_ok=True)
 
+# 重建前先清空旧页面：语料会被删改（文章下架、改名），若只复制不清理，
+# 旧 page 文件会残留成「幽灵页」——索引里已经查不到，但站点上仍能按
+# /data/pages/<标题>.md 直接下载，等于撤下的内容还挂在线上。
+# 2026-10-14 下架 10 篇非公开文章时发现该问题，故加此清理。
+for _ghost in PAGES.glob("*.md"):
+    _ghost.unlink()
+
 TYPE_COLOR = {
     "技术": "concept",
     "行业": "company",
@@ -142,7 +149,9 @@ for item in wiki_index:
 has_page = {f.stem for f in entity_files}
 ent_nodes = []
 for entity, count in entity_refs.items():
-    if count < MIN_ENTITY_REFS:
+    # 有实体页的即使当前引用数不足阈值也保留节点：实体页是花成本生成的
+    # 有效内容，不应因语料增删带来的引用数波动而变成「有页面、无入口」的孤儿。
+    if count < MIN_ENTITY_REFS and entity not in has_page:
         continue
     eid = f"entity:{entity}"
     if eid in node_ids:
